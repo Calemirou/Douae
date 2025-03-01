@@ -309,11 +309,12 @@
 
         .lyrics-line {
             padding: 5px 0;
-            transition: all 0.3s;
+            transition: all 0.2s ease-out;
             opacity: 0.5;
             font-size: 1rem;
             line-height: 1.5;
             text-align: center;
+            transform: translateY(0);
         }
 
         .lyrics-line.active {
@@ -321,7 +322,14 @@
             font-weight: bold;
             font-size: 1.1rem;
             color: #fff;
-            text-shadow: 0 0 5px rgba(135, 206, 235, 0.7);
+            text-shadow: 0 0 8px rgba(135, 206, 235, 0.9);
+            transform: translateY(-2px);
+        }
+        
+        /* Style for lines about to become active - creates a smoother transition */
+        .lyrics-line.pre-active {
+            opacity: 0.8;
+            transform: translateY(-1px);
         }
 
         /* Toggle button for lyrics */
@@ -363,7 +371,7 @@
     </div>
     
     <audio id="backgroundMusic" loop>
-        <source src="Tik tok.mp3" type="audio/mpeg">
+        <source src="Midnight Memories.mp3" type="audio/mpeg">
     </audio>
     
     <script>
@@ -376,7 +384,16 @@
             // Need user interaction to start audio
             document.addEventListener('click', function() {
                 if (musicEnabled) {
-                    backgroundMusic.play().catch(e => console.log('Audio play failed:', e));
+                    // Request preload of lyrics when user interacts
+                    requestPreload = true;
+                    
+                    // Preload audio for faster start
+                    backgroundMusic.load();
+                    
+                    // Small delay to allow preloading
+                    setTimeout(() => {
+                        backgroundMusic.play().catch(e => console.log('Audio play failed:', e));
+                    }, 100);
                 }
             }, { once: true });
             
@@ -689,48 +706,159 @@
                 lyricsWrapper.appendChild(lineElement);
             });
             
-            // Update lyrics based on current time
+            // Pre-calculate next line times for more efficient lookup
+            const nextLineTimes = [];
+            for (let i = 0; i < lyricsData.length - 1; i++) {
+                nextLineTimes[i] = lyricsData[i + 1].time;
+            }
+            nextLineTimes[lyricsData.length - 1] = Infinity;
+            
+            // Track current active line to avoid unnecessary DOM updates
+            let currentActiveIndex = -1;
+            
+            // Offset to make lyrics appear slightly earlier (in seconds)
+            const timeOffset = 0.15;
+            
+            // Update lyrics based on current time - optimized version
             function updateLyrics() {
                 if (!backgroundMusic.paused) {
-                    const currentTime = backgroundMusic.currentTime;
+                    const currentTime = backgroundMusic.currentTime + timeOffset; // Add slight offset for smoother transitions
                     
-                    // Find the current line
-                    let activeIndex = -1;
-                    for (let i = lyricsData.length - 1; i >= 0; i--) {
-                        if (currentTime >= lyricsData[i].time) {
-                            activeIndex = i;
-                            break;
+                    // Use binary search for more efficient lookup
+                    let activeIndex = findActiveLyricIndex(currentTime);
+                    
+                    // Only update DOM if the active line changed
+                    if (activeIndex !== currentActiveIndex) {
+                        // Update active line
+                        if (currentActiveIndex >= 0) {
+                            const oldActiveLine = document.getElementById(`line-${currentActiveIndex}`);
+                            if (oldActiveLine) oldActiveLine.classList.remove('active');
                         }
+                        
+                        if (activeIndex >= 0) {
+                            const newActiveLine = document.getElementById(`line-${activeIndex}`);
+                            if (newActiveLine) {
+                                newActiveLine.classList.add('active');
+                                
+                                // Auto-scroll to active line - only when needed
+                                if (lyricsShown) {
+                                    const lineTop = newActiveLine.offsetTop;
+                                    const wrapperHeight = lyricsWrapper.clientHeight;
+                                    const targetScrollTop = lineTop - (wrapperHeight / 2) + (newActiveLine.clientHeight / 2);
+                                    
+                                    // Smooth scroll with animation
+                                    if (Math.abs(lyricsWrapper.scrollTop - targetScrollTop) > 30) {
+                                        smoothScrollTo(lyricsWrapper, targetScrollTop, 300);
+                                    }
+                                }
+                            }
+                        }
+                        
+                        currentActiveIndex = activeIndex;
+                    }
+                }
+                
+                // Continue updating at 60fps
+                requestAnimationFrame(updateLyrics);
+            }
+            
+            // Binary search to find the current lyric index - much faster than linear search
+            function findActiveLyricIndex(currentTime) {
+                let low = 0;
+                let high = lyricsData.length - 1;
+                
+                while (low <= high) {
+                    const mid = Math.floor((low + high) / 2);
+                    
+                    if (currentTime >= lyricsData[mid].time && 
+                        (mid === lyricsData.length - 1 || currentTime < nextLineTimes[mid])) {
+                        return mid;
                     }
                     
-                    // Update active line
-                    if (activeIndex >= 0) {
-                        document.querySelectorAll('.lyrics-line').forEach(line => {
-                            line.classList.remove('active');
-                        });
+                    if (currentTime < lyricsData[mid].time) {
+                        high = mid - 1;
+                    } else {
+                        low = mid + 1;
+                    }
+                }
+                
+                return -1;
+            }
+            
+            // Smooth scrolling function
+            function smoothScrollTo(element, target, duration) {
+                const start = element.scrollTop;
+                const change = target - start;
+                const startTime = performance.now();
+                
+                function animateScroll(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    
+                    // Easing function for smoother scroll
+                    const easeProgress = progress < 0.5 ? 2 * progress * progress : -1 + (4 - 2 * progress) * progress;
+                    
+                    element.scrollTop = start + change * easeProgress;
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(animateScroll);
+                    }
+                }
+                
+                requestAnimationFrame(animateScroll);
+            }
+            
+            // Preload handling for smoother playback
+            let updateLyricsStarted = false;
+            let requestPreload = false;
+            
+            // Start tracking lyrics when music plays or when preloaded
+            backgroundMusic.addEventListener('play', function() {
+                if (!updateLyricsStarted) {
+                    updateLyrics();
+                    updateLyricsStarted = true;
+                }
+            });
+            
+            // Preload lyrics rendering for smoother startup
+            backgroundMusic.addEventListener('loadeddata', function() {
+                if (requestPreload && !updateLyricsStarted) {
+                    // Force a "fake" update to prepare the lyrics display
+                    updateLyrics();
+                    updateLyricsStarted = true;
+                }
+            });
+            
+            // Prepare upcoming lyrics - mark the next line as "pre-active" for smoother transition
+            function updateUpcomingLyrics() {
+                if (!backgroundMusic.paused && currentActiveIndex >= 0) {
+                    const currentTime = backgroundMusic.currentTime;
+                    
+                    // Find next line
+                    if (currentActiveIndex < lyricsData.length - 1) {
+                        const nextLineTime = lyricsData[currentActiveIndex + 1].time;
+                        const timeUntilNextLine = nextLineTime - currentTime;
                         
-                        const activeLine = document.getElementById(`line-${activeIndex}`);
-                        if (activeLine) {
-                            activeLine.classList.add('active');
-                            
-                            // Auto-scroll to active line
-                            if (lyricsShown) {
-                                const lineTop = activeLine.offsetTop;
-                                const wrapperHeight = lyricsWrapper.clientHeight;
-                                lyricsWrapper.scrollTop = lineTop - (wrapperHeight / 2) + (activeLine.clientHeight / 2);
+                        // If next line is coming soon (within 1 second)
+                        if (timeUntilNextLine < 1 && timeUntilNextLine > 0) {
+                            // Add pre-active class to next line
+                            const nextLine = document.getElementById(`line-${currentActiveIndex + 1}`);
+                            if (nextLine && !nextLine.classList.contains('pre-active')) {
+                                document.querySelectorAll('.lyrics-line.pre-active').forEach(line => {
+                                    line.classList.remove('pre-active');
+                                });
+                                nextLine.classList.add('pre-active');
                             }
                         }
                     }
                 }
                 
-                // Continue updating
-                requestAnimationFrame(updateLyrics);
+                // Update upcoming lyrics 10 times per second
+                setTimeout(updateUpcomingLyrics, 100);
             }
             
-            // Start tracking lyrics when music plays
-            backgroundMusic.addEventListener('play', function() {
-                updateLyrics();
-            });
+            // Start upcoming lyrics tracking
+            updateUpcomingLyrics();
             
             // Modify the music toggle to also handle lyrics visibility
             musicToggle.addEventListener('click', function() {
