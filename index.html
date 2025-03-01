@@ -4,145 +4,149 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>I Love You Douae</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
     <style>
-        * {
+        body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            overflow: hidden;
-            background: #000;
-            font-family: 'Arial', sans-serif;
-            color: white;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            position: relative;
-            cursor: pointer;
+            background: #000000;
+            font-family: "Arial", sans-serif;
+            overflow: hidden;
         }
         
-        canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 0;
-        }
-        
-        .content {
-            position: relative;
-            z-index: 10;
+        .container {
             text-align: center;
+            z-index: 10;
         }
         
         h1 {
-            font-size: 5rem;
-            font-weight: bold;
-            text-shadow: 0 0 10px rgba(255, 0, 128, 0.8), 
-                         0 0 20px rgba(255, 0, 128, 0.5),
-                         0 0 30px rgba(255, 0, 128, 0.3);
-            margin-bottom: 2rem;
-            opacity: 0;
-            transform: translateY(50px);
-            background: linear-gradient(45deg, #ff3399, #ff66b3, #ff99cc, #ff66b3, #ff3399);
-            background-size: 200% 200%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            animation: gradient 5s ease infinite;
+            color: white;
+            font-size: 4.5rem;
+            text-shadow: 0 0 10px rgba(255, 0, 150, 0.8);
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
         }
         
-        @keyframes gradient {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-        
-        .heart-container {
-            width: 150px;
-            height: 150px;
-            position: relative;
-            margin: 0 auto;
-            opacity: 0;
-            transform: scale(0.5);
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
         
         .heart {
-            width: 150px;
-            height: 150px;
-            background: #ff3366;
             position: relative;
-            transform: rotate(45deg);
-            box-shadow: 0 0 40px #ff3366;
-            animation: heartbeat 1.5s ease-in-out infinite;
+            width: 100px;
+            height: 90px;
+            margin: 50px auto;
+            cursor: pointer;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            transform: rotateY(0deg) rotateX(0deg);
+            transition: transform 0.5s;
+            animation: float 3s ease-in-out infinite;
         }
         
-        .heart::before,
-        .heart::after {
-            content: '';
-            width: 150px;
-            height: 150px;
-            background: #ff3366;
-            border-radius: 50%;
+        @keyframes float {
+            0% { transform: translateY(0) rotateY(0deg); }
+            50% { transform: translateY(-10px) rotateY(10deg); }
+            100% { transform: translateY(0) rotateY(0deg); }
+        }
+        
+        .heart:hover {
+            animation-play-state: paused;
+            transform: rotateY(20deg) scale(1.1);
+        }
+        
+        .heart-half {
             position: absolute;
-        }
-        
-        .heart::before {
-            top: -75px;
-            left: 0;
-        }
-        
-        .heart::after {
+            width: 50px;
+            height: 80px;
             top: 0;
-            left: -75px;
+            background: #3399ff; /* Blue heart color */
+            border-radius: 50px 50px 0 0;
+            box-shadow: 0 0 20px #3366ff;
+            transition: all 0.3s ease;
+        }
+        
+        .heart-half.left {
+            left: 50px;
+            transform: rotate(-45deg);
+            transform-origin: 0 100%;
+            filter: brightness(0.85);
+        }
+        
+        .heart-half.right {
+            left: 0;
+            transform: rotate(45deg);
+            transform-origin: 100% 100%;
+            filter: brightness(1.15);
+        }
+        
+        .heart-front {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateZ(5px);
+            border-radius: 50%;
+            opacity: 0.2;
+        }
+        
+        .heart-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform: translateZ(-5px);
+            border-radius: 50%;
+            opacity: 0.2;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .heart-shine {
+            position: absolute;
+            width: 30px;
+            height: 20px;
+            top: 20px;
+            left: 25px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: rotate(-30deg);
+            filter: blur(5px);
+        }
+        
+        .heart.pink .heart-half {
+            background: #ff3399; /* Pink color when clicked */
+            box-shadow: 0 0 20px #ff3366;
         }
         
         @keyframes heartbeat {
-            0% {
-                transform: rotate(45deg) scale(1);
-            }
-            14% {
-                transform: rotate(45deg) scale(1.1);
-            }
-            28% {
-                transform: rotate(45deg) scale(1);
-            }
-            42% {
-                transform: rotate(45deg) scale(1.15);
-            }
-            70% {
-                transform: rotate(45deg) scale(1);
-            }
+            0% { transform: scale(1); }
+            15% { transform: scale(1.2); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
         
         .message {
-            opacity: 0;
-            margin-top: 2rem;
+            color: white;
             font-size: 1.5rem;
-            max-width: 80%;
-            line-height: 1.5;
-        }
-        
-        .click-message {
-            position: fixed;
-            bottom: 20px;
-            font-size: 1rem;
+            margin: 20px auto;
+            max-width: 600px;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
             opacity: 0;
-            color: rgba(255, 255, 255, 0.7);
+            animation: fadeIn 2s forwards;
+            animation-delay: 1s;
         }
         
-        .particles {
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .stars {
             position: fixed;
             top: 0;
             left: 0;
@@ -152,30 +156,21 @@
             pointer-events: none;
         }
         
-        .particle {
+        .star {
             position: absolute;
-            pointer-events: none;
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite alternate;
         }
         
-        .rose {
-            border-radius: 50% 50% 0 50%;
-            background: radial-gradient(circle at 30% 30%, #ff99cc, #ff3366);
-            transform: rotate(45deg);
-        }
-        
-        .music-note {
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
+        @keyframes twinkle {
+            0% { opacity: 0.2; }
+            100% { opacity: 0.8; }
         }
         
         .butterfly {
-            width: 30px;
-            height: 30px;
             position: absolute;
+            pointer-events: none;
             z-index: 5;
         }
         
@@ -183,359 +178,299 @@
             position: absolute;
             width: 15px;
             height: 20px;
-            background: linear-gradient(45deg, #ff66cc, #cc66ff);
-            border-radius: 10px 15px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 80% 0 80% 20%;
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
         }
         
         .butterfly-wing.left {
-            left: 0;
             transform-origin: right center;
+            animation: flapLeft 0.5s infinite alternate;
         }
         
         .butterfly-wing.right {
-            right: 0;
             transform-origin: left center;
+            animation: flapRight 0.5s infinite alternate;
         }
         
-        .customize-panel {
+        @keyframes flapLeft {
+            from { transform: rotateY(50deg); }
+            to { transform: rotateY(0deg); }
+        }
+        
+        @keyframes flapRight {
+            from { transform: rotateY(-50deg); }
+            to { transform: rotateY(0deg); }
+        }
+        
+        .flowers {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 10px;
-            border-radius: 10px;
-            z-index: 100;
-            display: none;
+            bottom: 0;
+            width: 100%;
+            pointer-events: none;
         }
         
-        .customize-panel button {
-            background: #ff3366;
+        .flower {
+            position: absolute;
+            bottom: -20px;
+            width: 15px;
+            height: 15px;
+            background: pink;
+            border-radius: 50%;
+            animation: riseUp 10s linear infinite;
+        }
+        
+        @keyframes riseUp {
+            0% { 
+                transform: translateY(0) rotate(0deg); 
+                opacity: 0; 
+            }
+            10% { opacity: 1; }
+            100% { 
+                transform: translateY(-100vh) rotate(720deg); 
+                opacity: 0; 
+            }
+        }
+        
+        .click-me {
+            position: fixed;
+            bottom: 20px;
             color: white;
-            border: none;
-            padding: 5px 10px;
-            margin: 5px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .customize-panel button:hover {
-            background: #ff66cc;
-            transform: scale(1.05);
+            font-size: 1rem;
+            opacity: 0;
+            animation: fadeIn 2s forwards;
+            animation-delay: 3s;
         }
     </style>
 </head>
 <body>
-    <canvas id="bg-canvas"></canvas>
-    <div class="particles" id="particles"></div>
+    <div class="stars" id="stars"></div>
+    <div class="flowers" id="flowers"></div>
     
-    <div class="content">
-        <h1 id="title">I Love You Douae</h1>
-        
-        <div class="heart-container">
-            <div class="heart"></div>
-        </div>
-        
-        <div class="message" id="message">
-            Every moment with you is a treasure beyond compare. My heart beats only for you, and my world is brighter because you're in it.
+    <div class="container">
+        <h1>I Love You Douae</h1>
+        <div class="message">
+            Every moment with you makes my heart flutter. You are the light in my life, the joy in my heart, and the love in my soul.
         </div>
     </div>
     
-    <div class="click-message" id="click-message">Click anywhere for more magic...</div>
-    
-    <div class="customize-panel" id="customize-panel">
-        <button id="change-color">Change Colors</button>
-        <button id="add-butterflies">Add Butterflies</button>
-        <button id="add-fireworks">Add Fireworks</button>
-        <button id="change-message">Change Message</button>
-    </div>
+    <div class="click-me">Click anywhere to create hearts!</div>
     
     <script>
-        // Main animation controller
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize Three.js background
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            const renderer = new THREE.WebGLRenderer({
-                canvas: document.getElementById('bg-canvas'),
-                alpha: true
-            });
-            
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            
-            // Create starfield
-            const starsGeometry = new THREE.BufferGeometry();
-            const starsMaterial = new THREE.PointsMaterial({
-                color: 0xffffff,
-                size: 0.5
-            });
-            
-            const starsVertices = [];
-            for (let i = 0; i < 2000; i++) {
-                const x = (Math.random() - 0.5) * 2000;
-                const y = (Math.random() - 0.5) * 2000;
-                const z = -Math.random() * 1000;
-                starsVertices.push(x, y, z);
+        document.addEventListener("DOMContentLoaded", function() {
+            // Create stars
+            const starsContainer = document.getElementById("stars");
+            for (let i = 0; i < 100; i++) {
+                createStar();
             }
             
-            starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starsVertices, 3));
-            const stars = new THREE.Points(starsGeometry, starsMaterial);
-            scene.add(stars);
-            
-            camera.position.z = 5;
-            
-            // Animated elements
-            const title = document.getElementById('title');
-            const heartContainer = document.querySelector('.heart-container');
-            const message = document.getElementById('message');
-            const clickMessage = document.getElementById('click-message');
-            const customizePanel = document.getElementById('customize-panel');
-            
-            // Initial animation
-            const timeline = gsap.timeline({
-                defaults: { duration: 1, ease: "power3.out" }
-            });
-            
-            timeline
-                .to(title, { opacity: 1, y: 0, duration: 1.5 })
-                .to(heartContainer, { opacity: 1, scale: 1 }, "-=0.5")
-                .to(message, { opacity: 1 }, "-=0.3")
-                .to(clickMessage, { opacity: 1, delay: 1 });
-            
-            // Background animation
-            function animate() {
-                requestAnimationFrame(animate);
+            function createStar() {
+                const star = document.createElement("div");
+                star.classList.add("star");
                 
-                stars.rotation.x += 0.0003;
-                stars.rotation.y += 0.0003;
+                // Random properties
+                const size = Math.random() * 3 + 1;
+                const posX = Math.random() * window.innerWidth;
+                const posY = Math.random() * window.innerHeight;
                 
-                animateButterflies();
+                star.style.width = size + "px";
+                star.style.height = size + "px";
+                star.style.left = posX + "px";
+                star.style.top = posY + "px";
+                star.style.opacity = Math.random();
+                star.style.animationDuration = Math.random() * 3 + 1 + "s";
                 
-                renderer.render(scene, camera);
+                // Add twinkling animation
+                star.style.animation = `twinkle ${Math.random() * 5 + 2}s infinite`;
+                
+                starsContainer.appendChild(star);
             }
             
-            animate();
+            // Create flowers
+            const flowersContainer = document.getElementById("flowers");
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    createFlower();
+                }, i * 300);
+            }
             
-            // Window resize handling
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
+            // Periodically add more flowers
+            setInterval(() => {
+                createFlower();
+            }, 1000);
             
-            // Click interactions
-            let clickCount = 0;
-            document.body.addEventListener('click', function(event) {
-                clickCount++;
+            function createFlower() {
+                const flower = document.createElement("div");
+                flower.classList.add("flower");
                 
-                // Create particle explosion
-                createParticleExplosion(event.clientX, event.clientY);
+                // Random properties
+                const posX = Math.random() * window.innerWidth;
+                const size = Math.random() * 10 + 10;
+                const speed = Math.random() * 5 + 7;
                 
-                if (clickCount === 3) {
-                    // Show customize panel after 3 clicks
-                    customizePanel.style.display = 'block';
+                // Random color from pink spectrum
+                const hue = Math.random() * 30 + 330; // 330-360 (red to pink)
+                const color = `hsl(${hue}, 100%, 80%)`;
+                
+                flower.style.left = posX + "px";
+                flower.style.width = size + "px";
+                flower.style.height = size + "px";
+                flower.style.background = color;
+                flower.style.animationDuration = speed + "s";
+                
+                flowersContainer.appendChild(flower);
+                
+                // Remove after animation completes
+                setTimeout(() => {
+                    flower.remove();
+                }, speed * 1000);
+            }
+            
+            // Create butterflies and hearts on click
+            document.body.addEventListener("click", function(event) {
+                // Create butterflies at click position
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => {
+                        createButterfly(event.clientX, event.clientY);
+                    }, i * 100);
                 }
                 
-                // Change click message
-                if (clickCount === 1) {
-                    clickMessage.textContent = "Click again for more..."
-                } else if (clickCount === 2) {
-                    clickMessage.textContent = "One more click..."
-                } else {
-                    clickMessage.textContent = "Customize your experience!"
+                // Create more heart particles
+                for (let i = 0; i < 15; i++) {
+                    setTimeout(() => {
+                        createHeartParticle(event.clientX, event.clientY);
+                    }, i * 50);
                 }
             });
             
-            // Particle System
-            function createParticleExplosion(x, y) {
-                const particlesContainer = document.getElementById('particles');
-                const colors = ['#ff3366', '#ff66cc', '#ff99cc', '#ffccff'];
-                const types = ['rose', 'music-note'];
+            function createButterfly(x, y) {
+                const butterfly = document.createElement("div");
+                butterfly.classList.add("butterfly");
                 
-                for (let i = 0; i < 20; i++) {
-                    const particle = document.createElement('div');
-                    particle.className = 'particle';
-                    
-                    // Random particle type
-                    const type = types[Math.floor(Math.random() * types.length)];
-                    
-                    if (type === 'rose') {
-                        particle.classList.add('rose');
-                        particle.style.width = Math.random() * 20 + 10 + 'px';
-                        particle.style.height = Math.random() * 20 + 10 + 'px';
-                        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-                    } else if (type === 'music-note') {
-                        particle.classList.add('music-note');
-                        particle.innerHTML = ['♪', '♫', '♬', '♩'][Math.floor(Math.random() * 4)];
-                    }
-                    
-                    // Position near click point
-                    particle.style.left = x + 'px';
-                    particle.style.top = y + 'px';
-                    
-                    // Add to DOM
-                    particlesContainer.appendChild(particle);
-                    
-                    // Animate with GSAP
-                    gsap.to(particle, {
-                        x: (Math.random() - 0.5) * 200,
-                        y: (Math.random() - 0.5) * 200,
-                        opacity: 0,
-                        rotation: Math.random() * 720 - 360,
-                        duration: Math.random() * 2 + 1,
-                        ease: "power2.out",
-                        onComplete: function() {
-                            particle.remove();
-                        }
-                    });
-                }
-            }
-            
-            // Butterfly animation
-            const butterflies = [];
-            
-            function createButterfly() {
-                const butterfly = document.createElement('div');
-                butterfly.className = 'butterfly';
+                // Create wings
+                const leftWing = document.createElement("div");
+                leftWing.classList.add("butterfly-wing", "left");
                 
-                const leftWing = document.createElement('div');
-                leftWing.className = 'butterfly-wing left';
-                
-                const rightWing = document.createElement('div');
-                rightWing.className = 'butterfly-wing right';
+                const rightWing = document.createElement("div");
+                rightWing.classList.add("butterfly-wing", "right");
                 
                 butterfly.appendChild(leftWing);
                 butterfly.appendChild(rightWing);
                 
                 // Random color
                 const hue = Math.random() * 60 + 300; // Pink to purple range
-                const color = `hsl(${hue}, 100%, 70%)`;
+                const color = `hsla(${hue}, 100%, 75%, 0.7)`;
                 leftWing.style.background = color;
                 rightWing.style.background = color;
                 
-                // Random position at the bottom of the screen
-                butterfly.style.left = Math.random() * window.innerWidth + 'px';
-                butterfly.style.top = window.innerHeight + 'px';
+                // Position and style
+                butterfly.style.left = x + "px";
+                butterfly.style.top = y + "px";
                 
                 document.body.appendChild(butterfly);
                 
-                // Animation data
-                const butterflyData = {
-                    element: butterfly,
-                    leftWing: leftWing,
-                    rightWing: rightWing,
-                    x: parseFloat(butterfly.style.left),
-                    y: parseFloat(butterfly.style.top),
-                    speedX: Math.random() * 2 - 1,
-                    speedY: -Math.random() * 2 - 1,
-                    wingPhase: Math.random() * Math.PI * 2
-                };
+                // Animate butterfly
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 2 + 1;
+                const startTime = Date.now();
                 
-                butterflies.push(butterflyData);
+                function animateButterfly() {
+                    const elapsed = Date.now() - startTime;
+                    const dx = Math.cos(angle) * speed;
+                    const dy = Math.sin(angle) - elapsed / 2000; // Gradually float up
+                    
+                    const currentX = parseFloat(butterfly.style.left);
+                    const currentY = parseFloat(butterfly.style.top);
+                    
+                    butterfly.style.left = (currentX + dx) + "px";
+                    butterfly.style.top = (currentY + dy) + "px";
+                    
+                    // Remove if out of screen
+                    if (currentY < -50 || currentX < -50 || currentX > window.innerWidth + 50) {
+                        butterfly.remove();
+                        return;
+                    }
+                    
+                    requestAnimationFrame(animateButterfly);
+                }
                 
-                return butterflyData;
+                animateButterfly();
+                
+                // Remove after 10 seconds
+                setTimeout(() => {
+                    butterfly.remove();
+                }, 10000);
             }
             
-            function animateButterflies() {
-                for (let i = 0; i < butterflies.length; i++) {
-                    const butterfly = butterflies[i];
+            function createHeartParticle(x, y) {
+                const particle = document.createElement("div");
+                particle.classList.add("heart");
+                particle.style.position = "absolute";
+                particle.style.left = x + "px";
+                particle.style.top = y + "px";
+                particle.style.width = (Math.random() * 25 + 15) + "px";
+                particle.style.height = (Math.random() * 25 + 15) + "px";
+                particle.style.opacity = 1;
+                
+                // Add 3D heart parts to the particle
+                const leftHalf = document.createElement("div");
+                leftHalf.classList.add("heart-half", "left");
+                
+                const rightHalf = document.createElement("div");
+                rightHalf.classList.add("heart-half", "right");
+                
+                // Randomly choose between blue and pink hearts
+                const isBlue = Math.random() > 0.5;
+                if (!isBlue) {
+                    particle.classList.add("pink");
+                }
+                
+                particle.appendChild(leftHalf);
+                particle.appendChild(rightHalf);
+                
+                document.body.appendChild(particle);
+                
+                // Random movement
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 100 + 50;
+                const endX = x + Math.cos(angle) * distance;
+                const endY = y + Math.sin(angle) * distance;
+                
+                // Animate
+                const startTime = Date.now();
+                const duration = Math.random() * 1000 + 1000;
+                
+                function animateParticle() {
+                    const elapsed = Date.now() - startTime;
+                    const progress = elapsed / duration;
                     
-                    // Update position
-                    butterfly.x += butterfly.speedX;
-                    butterfly.y += butterfly.speedY;
-                    
-                    // Slightly random movement
-                    butterfly.speedX += (Math.random() - 0.5) * 0.1;
-                    butterfly.speedY += (Math.random() - 0.5) * 0.1;
-                    
-                    // Keep within reasonable speed
-                    butterfly.speedX *= 0.99;
-                    butterfly.speedY *= 0.99;
-                    
-                    // Apply position
-                    butterfly.element.style.left = butterfly.x + 'px';
-                    butterfly.element.style.top = butterfly.y + 'px';
-                    
-                    // Wing flapping animation
-                    butterfly.wingPhase += 0.1;
-                    const wingAngle = Math.sin(butterfly.wingPhase) * 30;
-                    
-                    butterfly.leftWing.style.transform = `rotateY(${-wingAngle}deg)`;
-                    butterfly.rightWing.style.transform = `rotateY(${wingAngle}deg)`;
-                    
-                    // Remove butterflies that are off-screen
-                    if (butterfly.y < -100 || butterfly.x < -100 || butterfly.x > window.innerWidth + 100) {
-                        butterfly.element.remove();
-                        butterflies.splice(i, 1);
-                        i--;
+                    if (progress >= 1) {
+                        particle.remove();
+                        return;
                     }
+                    
+                    const currentX = x + (endX - x) * progress;
+                    const currentY = y + (endY - y) * progress - 50 * Math.sin(progress * Math.PI);
+                    
+                    particle.style.left = currentX + "px";
+                    particle.style.top = currentY + "px";
+                    particle.style.opacity = 1 - progress;
+                    particle.style.transform = `scale(${1 - progress * 0.5})`;
+                    
+                    requestAnimationFrame(animateParticle);
                 }
-            }
-            
-            // Add event listeners for customization buttons
-            document.getElementById('change-color').addEventListener('click', function() {
-                const hue = Math.floor(Math.random() * 360);
-                const newColor = `hsl(${hue}, 80%, 60%)`;
-                const lightColor = `hsl(${hue}, 80%, 80%)`;
                 
-                document.querySelector('.heart').style.background = newColor;
-                document.querySelector('.heart::before').style.background = newColor;
-                document.querySelector('.heart::after').style.background = newColor;
-                
-                title.style.textShadow = `0 0 10px ${newColor}, 0 0 20px ${lightColor}, 0 0 30px ${lightColor}`;
-            });
-            
-            document.getElementById('add-butterflies').addEventListener('click', function() {
-                for (let i = 0; i < 5; i++) {
-                    createButterfly();
-                }
-            });
-            
-            document.getElementById('add-fireworks').addEventListener('click', function() {
-                createFireworks();
-            });
-            
-            document.getElementById('change-message').addEventListener('click', function() {
-                const messages = [
-                    "You are the light of my life, Douae. Every moment with you feels like a dream.",
-                    "My love for you grows stronger with each passing day, Douae.",
-                    "In your eyes, I found my home. In your heart, I found my love. I love you, Douae.",
-                    "You are my today and all of my tomorrows. I will love you forever, Douae.",
-                    "Loving you is not just a choice, it's a blessing that makes my life complete, Douae."
-                ];
-                
-                const newMessage = messages[Math.floor(Math.random() * messages.length)];
-                
-                gsap.to(message, {
-                    opacity: 0,
-                    y: -20,
-                    duration: 0.5,
-                    onComplete: function() {
-                        message.textContent = newMessage;
-                        gsap.to(message, {
-                            opacity: 1,
-                            y: 0,
-                            duration: 0.8
-                        });
-                    }
-                });
-            });
-            
-            // Fireworks function
-            function createFireworks() {
-                for (let i = 0; i < 5; i++) {
-                    setTimeout(() => {
-                        const x = Math.random() * window.innerWidth;
-                        const y = Math.random() * (window.innerHeight / 2);
-                        createParticleExplosion(x, y);
-                    }, i * 300);
-                }
+                animateParticle();
             }
             
             // Create initial butterflies
             for (let i = 0; i < 3; i++) {
-                createButterfly();
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * window.innerHeight;
+                
+                setTimeout(() => {
+                    createButterfly(x, y);
+                }, i * 1000);
             }
         });
     </script>
