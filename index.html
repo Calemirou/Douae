@@ -281,9 +281,15 @@
     
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            // Try to play background music when the page loads
+document.addEventListener('click', function() {
+  if (soundEnabled) {
+    backgroundMusic.play().catch(e => console.log('Audio play failed:', e));
+  }
+}, { once: true });
             // Sound effects
             let soundEnabled = true;
-            const backgroundMusic = new Audio('https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js');
+            const backgroundMusic = new Audio('./assets/# Midnight Memories.mp3');
             backgroundMusic.volume = 0.3;
             backgroundMusic.loop = true;
             
