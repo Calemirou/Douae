@@ -250,8 +250,8 @@
             animation-delay: 3s;
         }
         
-        /* Added sound control */
-        .sound-control {
+        /* Music control */
+        .music-control {
             position: fixed;
             top: 20px;
             right: 20px;
@@ -277,94 +277,38 @@
     </div>
     
     <div class="click-me">Click anywhere to create hearts!</div>
-    <div class="sound-control" id="soundToggle">🔊 Sound On</div>
+    <div class="music-control" id="musicToggle">🎵 Music On</div>
+    
+    <audio id="backgroundMusic" loop>
+        <source src="Midnight Memories.mp3" type="audio/mpeg">
+    </audio>
     
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Try to play background music when the page loads
-document.addEventListener('click', function() {
-  if (soundEnabled) {
-    backgroundMusic.play().catch(e => console.log('Audio play failed:', e));
-  }
-}, { once: true });
-            // Sound effects
-            let soundEnabled = true;
-            const backgroundMusic = new Audio('./assets/# Midnight Memories.mp3');
-            backgroundMusic.volume = 0.3;
-            backgroundMusic.loop = true;
+            // Background music setup
+            const backgroundMusic = document.getElementById('backgroundMusic');
+            backgroundMusic.volume = 0.5;
+            let musicEnabled = true;
             
-            // Create audio elements for various sound effects
-            const heartSounds = [
-                createAudio('data:audio/wav;base64,UklGRl9CAABXQVZFZm10IBAAAAABAAEAQB8AAAAAAAABAAgAZGF0YTtCAACBgYGCgoKDg4OEhISFhYWGhoaHh4eIiIiJiYmKioqLi4uMjIyNjY2Oj4+QkJCRkZGSkpKTk5OUlJSVlZWWlpaXl5eYmJiZmZmampqbm5ucnJydnZ2enp6fn5+goKChoaGioqKjo6OkpKSlpaWmpqanp6eoqKipqamqqqqrq6usrKytra2urq6vr6+wsLCxsbGysrKzs7O0tLS1tbW2tra3t7e4uLi5ubm6urq7u7u8vLy9vb2+vr6/v7/AwMDBwcHCwsLDw8PExMTFxcXGxsbHx8fIyMjJycnKysrLy8vMzMzNzc3Ozs7Pz8/Q0NDR0dHS0tLT09PU1NTV1dXW1tbX19fY2NjZ2dna2trb29vc3Nzd3d3e3t7f39/g4ODh4eHi4uLj4+Pk5OTl5eXm5ubn5+fo6Ojp6enq6urr6+vs7Ozt7e3u7u7v7+/w8PDx8fHy8vLz8/P09PT19fX29vb39/f4+Pj5+fn6+vr7+/v8/Pz9/f3+/v7///+AgICBgYGCgoKDg4OEhISFhYWGhoaHh4eIiIiJiYmKioqLi4uMjIyNjY2Oj4+QkJCRkZGSkpKTk5OUlJSVlZWWlpaXl5eYmJiZmZmampqbm5ucnJydnZ2enp6fn5+goKChoaGioqKjo6OkpKSlpaWmpqanp6eoqKipqamqqqqrq6usrKytra2urq6vr6+wsLCxsbGysrKzs7O0tLS1tbW2tra3t7e4uLi5ubm6urq7u7u8vLy9vb2+vr6/v7/AwMDBwcHCwsLDw8PExMTFxcXGxsbHx8fIyMjJycnKysrLy8vMzMzNzc3Ozs7Pz8/Q0NDR0dHS0tLT09PU1NTV1dXW1tbX19fY2NjZ2dna2trb29vc3Nzd3d3e3t7f39/g4ODh4eHi4uLj4+Pk5OTl5eXm5ubn5+fo6Ojp6enq6urr6+vs7Ozt7e3u7u7v7+/w8PDx8fHy8vLz8/P09PT19fX29vb39/f4+Pj5+fn6+vr7+/v8/Pz9/f3+/v7///8='),
-                createAudio('data:audio/wav;base64,UklGRl9CAABXQVZFZm10IBAAAAABAAEAQB8AAAAAAAABAAgAZGF0YTtCAACBgYGCgoKDg4OEhISFhYWGhoaHh4eIiIiJiYmKioqLi4uMjIyNjY2Oj4+QkJCRkZGSkpKTk5OUlJSVlZWWlpaXl5eYmJiZmZmampqbm5ucnJydnZ2enp6fn5+goKChoaGioqKjo6OkpKSlpaWmpqanp6eoqKipqamqqqqrq6usrKytra2urq6vr6+wsLCxsbGysrKzs7O0tLS1tbW2tra3t7e4uLi5ubm6urq7u7u8vLy9vb2+vr6/v7/AwMDBwcHCwsLDw8PExMTFxcXGxsbHx8fIyMjJycnKysrLy8vMzMzNzc3Ozs7Pz8/Q0NDR0dHS0tLT09PU1NTV1dXW1tbX19fY2NjZ2dna2trb29vc3Nzd3d3e3t7f39/g4ODh4eHi4uLj4+Pk5OTl5eXm5ubn5+fo6Ojp6enq6urr6+vs7Ozt7e3u7u7v7+/w8PDx8fHy8vLz8/P09PT19fX29vb39/f4+Pj5+fn6+vr7+/v8/Pz9/f3+/v7///8='),
-                createAudio('data:audio/wav;base64,UklGRl9CAABXQVZFZm10IBAAAAABAAEAQB8AAAAAAAABAAgAZGF0YTtCAACBgYGCgoKDg4OEhISFhYWGhoaHh4eIiIiJiYmKioqLi4uMjIyNjY2Oj4+QkJCRkZGSkpKTk5OUlJSVlZWWlpaXl5eYmJiZmZmampqbm5ucnJydnZ2enp6fn5+goKChoaGioqKjo6OkpKSlpaWmpqanp6eoqKipqamqqqqrq6usrKytra2urq6vr6+wsLCxsbGysrKzs7O0tLS1tbW2tra3t7e4uLi5ubm6urq7u7u8vLy9vb2+vr6/v7/AwMDBwcHCwsLDw8PExMTFxcXGxsbHx8fIyMjJycnKysrLy8vMzMzNzc3Ozs7Pz8/Q0NDR0dHS0tLT09PU1NTV1dXW1tbX19fY2NjZ2dna2trb29vc3Nzd3d3e3t7f39/g4ODh4eHi4uLj4+Pk5OTl5eXm5ubn5+fo6Ojp6enq6urr6+vs7Ozt7e3u7u7v7+/w8PDx8fHy8vLz8/P09PT19fX29vb39/f4+Pj5+fn6+vr7+/v8/Pz9/f3+/v7///8=')
-            ];
+            // Need user interaction to start audio
+            document.addEventListener('click', function() {
+                if (musicEnabled) {
+                    backgroundMusic.play().catch(e => console.log('Audio play failed:', e));
+                }
+            }, { once: true });
             
-            // Create heartbeat sound
-            const heartbeatSound = createAudio('data:audio/wav;base64,UklGRl9CAABXQVZFZm10IBAAAAABAAEAQB8AAAAAAAABAAgAZGF0YTtCAACBgYGCgoKDg4OEhISFhYWGhoaHh4eIiIiJiYmKioqLi4uMjIyNjY2Oj4+QkJCRkZGSkpKTk5OUlJSVlZWWlpaXl5eYmJiZmZmampqbm5ucnJydnZ2enp6fn5+goKChoaGioqKjo6OkpKSlpaWmpqanp6eoqKipqamqqqqrq6usrKytra2urq6vr6+wsLCxsbGysrKzs7O0tLS1tbW2tra3t7e4uLi5ubm6urq7u7u8vLy9vb2+vr6/v7/AwMDBwcHCwsLDw8PExMTFxcXGxsbHx8fIyMjJycnKysrLy8vMzMzNzc3Ozs7Pz8/Q0NDR0dHS0tLT09PU1NTV1dXW1tbX19fY2NjZ2dna2trb29vc3Nzd3d3e3t7f39/g4ODh4eHi4uLj4+Pk5OTl5eXm5ubn5+fo6Ojp6enq6urr6+vs7Ozt7e3u7u7v7+/w8PDx8fHy8vLz8/P09PT19fX29vb39/f4+Pj5+fn6+vr7+/v8/Pz9/f3+/v7///8=');
-            heartbeatSound.volume = 0.3;
-            
-            // Function to play heartbeat sound
-            function playHeartbeatSound() {
-                if (!soundEnabled) return;
+            // Toggle music button
+            const musicToggle = document.getElementById('musicToggle');
+            musicToggle.addEventListener('click', function() {
+                musicEnabled = !musicEnabled;
+                musicToggle.textContent = musicEnabled ? '🎵 Music On' : '🎵 Music Off';
                 
-                const heartbeatClone = heartbeatSound.cloneNode();
-                heartbeatClone.volume = 0.2;
-                heartbeatClone.play();
-                
-                setTimeout(() => {
-                    const secondBeat = heartbeatSound.cloneNode();
-                    secondBeat.volume = 0.3;
-                    secondBeat.play();
-                    
-                    // Remove after playing
-                    secondBeat.onended = function() {
-                        secondBeat.remove();
-                    };
-                }, 300);
-                
-                // Remove after playing
-                heartbeatClone.onended = function() {
-                    heartbeatClone.remove();
-                };
-            }
-            
-            function createAudio(src) {
-                const audio = new Audio(src);
-                audio.volume = 0.5;
-                return audio;
-            }
-            
-            // Toggle sound button
-            const soundToggle = document.getElementById('soundToggle');
-            soundToggle.addEventListener('click', function() {
-                soundEnabled = !soundEnabled;
-                soundToggle.textContent = soundEnabled ? '🔊 Sound On' : '🔇 Sound Off';
-                
-                if (soundEnabled) {
-                    // backgroundMusic.play();
+                if (musicEnabled) {
+                    backgroundMusic.play().catch(e => console.log('Audio play failed:', e));
                 } else {
-                    // backgroundMusic.pause();
+                    backgroundMusic.pause();
                 }
             });
-            
-            // Play a random heart sound
-            function playRandomHeartSound() {
-                if (!soundEnabled) return;
-                
-                const randomIndex = Math.floor(Math.random() * heartSounds.length);
-                const sound = heartSounds[randomIndex];
-                
-                // Clone the sound to allow multiple sounds to play simultaneously
-                const soundClone = sound.cloneNode();
-                soundClone.volume = 0.3 + Math.random() * 0.2; // Slight volume variation
-                soundClone.play();
-                
-                // Remove after playing
-                soundClone.onended = function() {
-                    soundClone.remove();
-                };
-            }
             
             // Create stars
             const starsContainer = document.getElementById("stars");
@@ -436,9 +380,6 @@ document.addEventListener('click', function() {
             
             // Create butterflies and hearts on click
             document.body.addEventListener("click", function(event) {
-                // Play sound on click
-                playRandomHeartSound();
-                
                 // Create butterflies at click position
                 for (let i = 0; i < 5; i++) {
                     setTimeout(() => {
@@ -446,7 +387,7 @@ document.addEventListener('click', function() {
                     }, i * 100);
                 }
                 
-                // Create more heart particles
+                // Create heart particles
                 for (let i = 0; i < 15; i++) {
                     setTimeout(() => {
                         createHeartParticle(event.clientX, event.clientY);
@@ -454,18 +395,13 @@ document.addEventListener('click', function() {
                 }
             });
             
-            // Create hearts and play sounds on mouse movement
+            // Create hearts on mouse movement
             let lastMoveTime = 0;
             document.body.addEventListener("mousemove", function(event) {
                 const currentTime = Date.now();
                 // Only trigger effects every 300ms to avoid overwhelming effects
                 if (currentTime - lastMoveTime > 300) {
                     lastMoveTime = currentTime;
-                    
-                    // Play heartbeat sound
-                    if (soundEnabled) {
-                        playHeartbeatSound();
-                    }
                     
                     // Create heart at mouse position
                     createHeartParticle(event.clientX, event.clientY);
