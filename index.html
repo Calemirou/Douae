@@ -366,12 +366,12 @@
     <div class="lyrics-container" id="lyricsContainer">
         <div class="lyrics-title">Tik tok</div>
         <div class="lyrics-wrapper" id="lyricsWrapper">
-            <!-- Lyrics will be populated by JavaScript -->
+            <p class="lyrics-current" id="currentLyric">...</p>
         </div>
     </div>
     
     <audio id="backgroundMusic" loop>
-        <source src="Tik tok.mp3" type="audio/mpeg">
+        <source src="Midnight Memories.mp3" type="audio/mpeg">
     </audio>
     
     <script>
@@ -640,63 +640,67 @@
                 }, i * 1000);
             }
             
-            // Lyrics data from the SRT file - more detailed version
+            // Lyrics data updated to match the structure provided
             const lyricsData = [
-                { time: 0.0, text: "Tick tock," },
-                { time: 2.06, text: "watching clocks." },
-                { time: 4.019, text: "Dreams fade as my heart blocks." },
-                { time: 8.28, text: "Every day," },
-                { time: 10.56, text: "same old way." },
-                { time: 12.66, text: "Fighting just to say I'm okay." },
-                { time: 17.14, text: "Tick tock," },
-                { time: 19.44, text: "watching clocks." },
-                { time: 21.26, text: "Dreams fade as my heart blocks." },
-                { time: 25.64, text: "Every day," },
-                { time: 27.7, text: "same old way." },
-                { time: 29.54, text: "Fighting just to say I'm okay." },
-                { time: 33.98, text: "Started with a vision," },
-                { time: 36.24, text: "had a mission." },
-                { time: 37.16, text: "Now I'm wishing." },
-                { time: 39.099, text: "Could've made different decisions." },
-                { time: 41.32, text: "Now I'm missing all the chances that I had." },
-                { time: 45.58, text: "Looking back," },
-                { time: 46.72, text: "it makes me sadder." },
-                { time: 50.34, text: "Twenty-eight and feeling mad." },
-                { time: 55.92, text: "Was it all just a fad?" },
-                { time: 60.7, text: "Working minimum wage," },
-                { time: 62.8, text: "stuck inside this cage." },
-                { time: 64.54, text: "Turn another page." },
-                { time: 66.6, text: "Can't escape this stage." },
-                { time: 69.46, text: "I wanted stars," },
-                { time: 71.24, text: "but all I got were scars." },
-                { time: 77.359, text: "Tried to reach the moon," },
-                { time: 79.76, text: "but found I waited too soon," },
-                { time: 84.88, text: "too soon." },
-                { time: 85.64, text: "Mama," },
-                { time: 87.58, text: "I'm sorry," },
-                { time: 88.9, text: "I let you down," },
-                { time: 92.32, text: "it's haunting me." },
-                { time: 96.42, text: "Three a.m.," },
-                { time: 98.3, text: "walking home again." },
-                { time: 99.98, text: "Pocket empty," },
-                { time: 102.84, text: "heart full of pain." },
-                { time: 104.42, text: "Watch my friends on Instagram," },
-                { time: 108.24, text: "living life while here," },
-                { time: 111.96, text: "I am out." },
-                { time: 113.2, text: "Stuck in cycles again." },
-                { time: 115.62, text: "Never changing life keeps rearranging." },
-                { time: 120.86, text: "Remember when we used to say one day we would" },
-                { time: 126.2, text: "find a way?" },
-                { time: 130.12, text: "Now I'm just trying to survive," },
-                { time: 133.36, text: "barely keeping dreams alive." },
-                { time: 135.28, text: "Keep stacking mine," },
-                { time: 135.94, text: "keep cracking time," },
-                { time: 142.48, text: "keeps passing." },
-                { time: 144.88, text: "No more acting like it's all gonna be fine." },
-                { time: 150.44, text: "Like I'm gonna see the signs of better days ahead" },
-                { time: 155.8, text: "of me," },
-                { time: 158.45, text: "of all I was meant to be." },
-                { time: 165.94, text: "Dreams hope walks away." }
+                // Hook
+                { time: 0.0, text: "Tick-tock, watching clocks ♪" },
+                { time: 4.0, text: "Dreams fade as my heart blocks ♪" },
+                { time: 8.28, text: "Every day, same old way ♪" },
+                { time: 12.66, text: "Fighting just to say I'm okay ♪" },
+                // Hook repeat
+                { time: 17.14, text: "Tick-tock, watching clocks ♪" },
+                { time: 21.26, text: "Dreams fade as my heart blocks ♪" },
+                { time: 25.64, text: "Every day, same old way ♪" },
+                { time: 29.54, text: "Fighting just to say I'm okay ♪" },
+                
+                // Verse 1
+                { time: 33.98, text: "Started with a vision, had a mission, now I'm wishin' ♪" },
+                { time: 39.099, text: "Could've made different decisions, now I'm missin' ♪" },
+                { time: 41.32, text: "All the chances that I had, looking back it makes me sad ♪" },
+                { time: 50.34, text: "Twenty-eight and feeling mad, was it all just a fad? ♪" },
+                
+                // Pre-Chorus
+                { time: 60.7, text: "Working minimum wage ♪" },
+                { time: 62.8, text: "Stuck inside this cage ♪" },
+                { time: 64.54, text: "Turn another page ♪" },
+                { time: 66.6, text: "Can't escape this stage ♪" },
+                
+                // Chorus
+                { time: 69.46, text: "I wanted stars (wanted stars) ♪" },
+                { time: 71.24, text: "But all I got were scars (were scars) ♪" },
+                { time: 77.359, text: "Tried to reach the moon (the moon) ♪" },
+                { time: 79.76, text: "But fell down way too soon (too soon) ♪" },
+                { time: 85.64, text: "Mama I'm sorry (I'm sorry) ♪" },
+                { time: 88.9, text: "I let you down, it's haunting me (haunting me) ♪" },
+                
+                // Verse 2
+                { time: 96.42, text: "Three AM, walking home again ♪" },
+                { time: 99.98, text: "Pocket empty, heart full of pain ♪" },
+                { time: 104.42, text: "Watch my friends on Instagram ♪" },
+                { time: 108.24, text: "Living life while here I am ♪" },
+                { time: 113.2, text: "Stuck in cycles, never changing ♪" },
+                { time: 115.62, text: "Life keeps rearranging ♪" },
+                
+                // Bridge
+                { time: 120.86, text: "Remember when we used to say ♪" },
+                { time: 126.2, text: "One day we would find a way ♪" },
+                { time: 130.12, text: "Now I'm just trying to survive ♪" },
+                { time: 133.36, text: "Barely keeping dreams alive ♪" },
+                { time: 135.28, text: "(Barely keeping dreams alive) ♪" },
+                
+                // Verse 3
+                { time: 138.94, text: "Bills keep stacking, mind keeps cracking ♪" },
+                { time: 142.48, text: "Time keeps passing, no more acting ♪" },
+                { time: 144.88, text: "Like it's all gonna be fine ♪" },
+                { time: 148.44, text: "Like I'm gonna see the signs ♪" },
+                { time: 152.8, text: "Of better days ahead of me ♪" },
+                { time: 158.45, text: "Of all I was meant to be ♪" },
+                
+                // Outro
+                { time: 162.94, text: "Tick-tock (time fades) ♪" },
+                { time: 165.94, text: "Game stops (dreams fade) ♪" },
+                { time: 168.94, text: "Life drops (heart breaks) ♪" },
+                { time: 171.94, text: "Hope walks away... ♪" }
             ];
 
             // Get DOM elements for lyrics
@@ -708,25 +712,25 @@
             // Set up lyrics toggle button
             lyricsToggle.addEventListener('click', function() {
                 lyricsShown = !lyricsShown;
-                lyricsContainer.style.display = lyricsShown ? 'block' : 'none';
-                lyricsToggle.textContent = lyricsShown ? '🎵 Hide Lyrics' : '🎵 Show Lyrics';
+                if (lyricsShown) {
+                    lyricsContainer.style.display = 'block';
+                    // Small delay to allow display to initialize before animation
+                    setTimeout(() => {
+                        lyricsContainer.classList.add('visible');
+                    }, 10);
+                    lyricsToggle.textContent = '🎵 Hide Lyrics';
+                } else {
+                    lyricsContainer.classList.remove('visible');
+                    // Wait for animation to complete before hiding
+                    setTimeout(() => {
+                        lyricsContainer.style.display = 'none';
+                    }, 300);
+                    lyricsToggle.textContent = '🎵 Show Lyrics';
+                }
             });
             
-            // Create lyrics elements
-            lyricsData.forEach((line, index) => {
-                const lineElement = document.createElement('div');
-                lineElement.classList.add('lyrics-line');
-                lineElement.id = `line-${index}`;
-                lineElement.textContent = line.text;
-                lyricsWrapper.appendChild(lineElement);
-            });
-            
-            // Pre-calculate next line times for more efficient lookup
-            const nextLineTimes = [];
-            for (let i = 0; i < lyricsData.length - 1; i++) {
-                nextLineTimes[i] = lyricsData[i + 1].time;
-            }
-            nextLineTimes[lyricsData.length - 1] = Infinity;
+            // Current lyric element
+            const currentLyricElement = document.getElementById('currentLyric');
             
             // Track current active line to avoid unnecessary DOM updates
             let currentActiveIndex = -1;
@@ -734,39 +738,23 @@
             // Offset to make lyrics appear slightly earlier (in seconds)
             const timeOffset = 0.15;
             
-            // Update lyrics based on current time - optimized version
+            // Update lyrics based on current time - optimized version for single line display with look-ahead
             function updateLyrics() {
                 if (!backgroundMusic.paused) {
-                    const currentTime = backgroundMusic.currentTime + timeOffset; // Add slight offset for smoother transitions
+                    const currentTime = backgroundMusic.currentTime;
                     
-                    // Use binary search for more efficient lookup
-                    let activeIndex = findActiveLyricIndex(currentTime);
+                    // Use the look-ahead system to find the correct lyric to display
+                    let activeIndex = findLyricWithLookahead(currentTime);
                     
                     // Only update DOM if the active line changed
                     if (activeIndex !== currentActiveIndex) {
-                        // Update active line
-                        if (currentActiveIndex >= 0) {
-                            const oldActiveLine = document.getElementById(`line-${currentActiveIndex}`);
-                            if (oldActiveLine) oldActiveLine.classList.remove('active');
-                        }
-                        
                         if (activeIndex >= 0) {
-                            const newActiveLine = document.getElementById(`line-${activeIndex}`);
-                            if (newActiveLine) {
-                                newActiveLine.classList.add('active');
-                                
-                                // Auto-scroll to active line - only when needed
-                                if (lyricsShown) {
-                                    const lineTop = newActiveLine.offsetTop;
-                                    const wrapperHeight = lyricsWrapper.clientHeight;
-                                    const targetScrollTop = lineTop - (wrapperHeight / 2) + (newActiveLine.clientHeight / 2);
-                                    
-                                    // Smooth scroll with animation
-                                    if (Math.abs(lyricsWrapper.scrollTop - targetScrollTop) > 30) {
-                                        smoothScrollTo(lyricsWrapper, targetScrollTop, 300);
-                                    }
-                                }
-                            }
+                            // Update the current lyric with animation
+                            currentLyricElement.style.animation = 'none';
+                            // Trigger reflow
+                            void currentLyricElement.offsetWidth;
+                            currentLyricElement.textContent = lyricsData[activeIndex].text;
+                            currentLyricElement.style.animation = 'fadeText 0.3s ease-out';
                         }
                         
                         currentActiveIndex = activeIndex;
@@ -777,16 +765,51 @@
                 requestAnimationFrame(updateLyrics);
             }
             
+            // Improved lyric finding with look-ahead to reduce delay
+            function findLyricWithLookahead(currentTime) {
+                // Look-ahead time (seconds) - adjust this as needed
+                const lookAheadTime = 0.25;
+                
+                // Use adjusted time for finding lyrics
+                const adjustedTime = currentTime + lookAheadTime;
+                
+                // Find the lyrics index using adjusted time
+                let index = findActiveLyricIndex(adjustedTime);
+                
+                // If we're very close to the next lyric, show it slightly early
+                if (index !== -1 && index < lyricsData.length - 1) {
+                    const nextLyricTime = lyricsData[index + 1].time;
+                    const timeToNextLyric = nextLyricTime - currentTime;
+                    
+                    // If next lyric is coming within 0.2 seconds and current lyric has been shown for at least 0.5 seconds
+                    if (timeToNextLyric < 0.2 && currentTime - lyricsData[index].time > 0.5) {
+                        return index + 1;
+                    }
+                }
+                
+                return index;
+            }
+            
             // Binary search to find the current lyric index - much faster than linear search
             function findActiveLyricIndex(currentTime) {
                 let low = 0;
                 let high = lyricsData.length - 1;
                 
+                // Empty lyrics case
+                if (high < 0) return -1;
+                
+                // Before first lyric
+                if (currentTime < lyricsData[0].time) return -1;
+                
+                // After last lyric
+                if (currentTime >= lyricsData[high].time) return high;
+                
                 while (low <= high) {
                     const mid = Math.floor((low + high) / 2);
                     
+                    // Found the perfect match
                     if (currentTime >= lyricsData[mid].time && 
-                        (mid === lyricsData.length - 1 || currentTime < nextLineTimes[mid])) {
+                        (mid === lyricsData.length - 1 || currentTime < lyricsData[mid + 1].time)) {
                         return mid;
                     }
                     
@@ -834,46 +857,6 @@
                     updateLyricsStarted = true;
                 }
             });
-            
-            // Preload lyrics rendering for smoother startup
-            backgroundMusic.addEventListener('loadeddata', function() {
-                if (requestPreload && !updateLyricsStarted) {
-                    // Force a "fake" update to prepare the lyrics display
-                    updateLyrics();
-                    updateLyricsStarted = true;
-                }
-            });
-            
-            // Prepare upcoming lyrics - mark the next line as "pre-active" for smoother transition
-            function updateUpcomingLyrics() {
-                if (!backgroundMusic.paused && currentActiveIndex >= 0) {
-                    const currentTime = backgroundMusic.currentTime;
-                    
-                    // Find next line
-                    if (currentActiveIndex < lyricsData.length - 1) {
-                        const nextLineTime = lyricsData[currentActiveIndex + 1].time;
-                        const timeUntilNextLine = nextLineTime - currentTime;
-                        
-                        // If next line is coming soon (within 1 second)
-                        if (timeUntilNextLine < 1 && timeUntilNextLine > 0) {
-                            // Add pre-active class to next line
-                            const nextLine = document.getElementById(`line-${currentActiveIndex + 1}`);
-                            if (nextLine && !nextLine.classList.contains('pre-active')) {
-                                document.querySelectorAll('.lyrics-line.pre-active').forEach(line => {
-                                    line.classList.remove('pre-active');
-                                });
-                                nextLine.classList.add('pre-active');
-                            }
-                        }
-                    }
-                }
-                
-                // Update upcoming lyrics 10 times per second
-                setTimeout(updateUpcomingLyrics, 100);
-            }
-            
-            // Start upcoming lyrics tracking
-            updateUpcomingLyrics();
             
             // Modify the music toggle to also handle lyrics visibility
             musicToggle.addEventListener('click', function() {
