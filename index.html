@@ -263,6 +263,80 @@
             cursor: pointer;
             z-index: 100;
         }
+        
+        /* Lyrics Styling */
+        .lyrics-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 500px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 15px;
+            color: white;
+            z-index: 100;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            display: none; /* Initially hidden */
+        }
+
+        .lyrics-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #87CEEB; /* Match your heart color */
+        }
+
+        .lyrics-wrapper {
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 10px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+        }
+
+        .lyrics-wrapper::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .lyrics-wrapper::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        .lyrics-line {
+            padding: 5px 0;
+            transition: all 0.3s;
+            opacity: 0.5;
+            font-size: 1rem;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        .lyrics-line.active {
+            opacity: 1;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #fff;
+            text-shadow: 0 0 5px rgba(135, 206, 235, 0.7);
+        }
+
+        /* Toggle button for lyrics */
+        .lyrics-toggle {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            color: white;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            z-index: 101;
+        }
     </style>
 </head>
 <body>
@@ -278,6 +352,15 @@
     
     <div class="click-me">Click anywhere to create hearts!</div>
     <div class="music-control" id="musicToggle">🎵 Music On</div>
+    <div class="lyrics-toggle" id="lyricsToggle">🎵 Show Lyrics</div>
+    
+    <!-- Lyrics Container -->
+    <div class="lyrics-container" id="lyricsContainer">
+        <div class="lyrics-title">Tik tok</div>
+        <div class="lyrics-wrapper" id="lyricsWrapper">
+            <!-- Lyrics will be populated by JavaScript -->
+        </div>
+    </div>
     
     <audio id="backgroundMusic" loop>
         <source src="Midnight Memories.mp3" type="audio/mpeg">
@@ -539,6 +622,129 @@
                     createButterfly(x, y);
                 }, i * 1000);
             }
+            
+            // Lyrics data from the SRT file
+            const lyricsData = [
+                { time: 0.0, text: "Tick tock," },
+                { time: 2.06, text: "watching clocks." },
+                { time: 4.019, text: "Dreams fade as my heart blocks." },
+                { time: 8.28, text: "Every day," },
+                { time: 10.56, text: "same old way." },
+                { time: 12.66, text: "Fighting just to say I'm okay." },
+                { time: 17.14, text: "Tick tock," },
+                { time: 19.44, text: "watching clocks." },
+                { time: 21.26, text: "Dreams fade as my heart blocks." },
+                { time: 25.64, text: "Every day," },
+                { time: 27.7, text: "same old way." },
+                { time: 29.54, text: "Fighting just to say I'm okay." },
+                { time: 33.98, text: "Started with a vision," },
+                { time: 36.24, text: "had a mission." },
+                { time: 37.16, text: "Now I'm wishing." },
+                { time: 39.099, text: "Could've made different decisions." },
+                { time: 41.32, text: "Now I'm missing all the chances that I had." },
+                { time: 45.58, text: "Looking back," },
+                { time: 46.72, text: "it makes me sadder." },
+                { time: 50.34, text: "Twenty-eight and feeling mad." },
+                { time: 55.92, text: "Was it all just a fad?" },
+                { time: 60.7, text: "Working minimum wage Stuck inside this cage" },
+                { time: 65.42, text: "Turn another page Can't escape this stage" },
+                { time: 71.24, text: "I wanted stars But all I got were scars" },
+                { time: 79.76, text: "Tried to reach the moon But found I wait too soon" },
+                { time: 87.58, text: "Mama, I'm sorry I let you down," },
+                { time: 92.32, text: "it's haunting me Haunting me" },
+                { time: 98.3, text: "Three AM, walking home again" },
+                { time: 102.84, text: "Pocket empty, heart full of pain" },
+                { time: 108.24, text: "Watch my friends on Instagram" },
+                { time: 112.92, text: "Living life while here I am, yeah" },
+                { time: 115.52, text: "Stuck in cycles, my heart keeps on pounding" },
+                { time: 120.86, text: "I'm waiting for you over here, never changing" },
+                { time: 126.2, text: "life keeps rearranging remember when we used to say" },
+                { time: 134.06, text: "one day we would find a way now I'm just trying to survive" },
+                { time: 142.92, text: "barely keeping dreams alive keep stacking" },
+                { time: 152.7, text: "mine keeps cracking time keeps passing no more acting" },
+                { time: 162.22, text: "like it's all gonna be fine like I'm gonna see the" },
+                { time: 169.88, text: "signs of better days ahead of me of all I was" },
+                { time: 175.96, text: "meant to be dreams hope walks away." }
+            ];
+
+            // Get DOM elements for lyrics
+            const lyricsContainer = document.getElementById('lyricsContainer');
+            const lyricsWrapper = document.getElementById('lyricsWrapper');
+            const lyricsToggle = document.getElementById('lyricsToggle');
+            let lyricsShown = false;
+            
+            // Set up lyrics toggle button
+            lyricsToggle.addEventListener('click', function() {
+                lyricsShown = !lyricsShown;
+                lyricsContainer.style.display = lyricsShown ? 'block' : 'none';
+                lyricsToggle.textContent = lyricsShown ? '🎵 Hide Lyrics' : '🎵 Show Lyrics';
+            });
+            
+            // Create lyrics elements
+            lyricsData.forEach((line, index) => {
+                const lineElement = document.createElement('div');
+                lineElement.classList.add('lyrics-line');
+                lineElement.id = `line-${index}`;
+                lineElement.textContent = line.text;
+                lyricsWrapper.appendChild(lineElement);
+            });
+            
+            // Update lyrics based on current time
+            function updateLyrics() {
+                if (!backgroundMusic.paused) {
+                    const currentTime = backgroundMusic.currentTime;
+                    
+                    // Find the current line
+                    let activeIndex = -1;
+                    for (let i = lyricsData.length - 1; i >= 0; i--) {
+                        if (currentTime >= lyricsData[i].time) {
+                            activeIndex = i;
+                            break;
+                        }
+                    }
+                    
+                    // Update active line
+                    if (activeIndex >= 0) {
+                        document.querySelectorAll('.lyrics-line').forEach(line => {
+                            line.classList.remove('active');
+                        });
+                        
+                        const activeLine = document.getElementById(`line-${activeIndex}`);
+                        if (activeLine) {
+                            activeLine.classList.add('active');
+                            
+                            // Auto-scroll to active line
+                            if (lyricsShown) {
+                                const lineTop = activeLine.offsetTop;
+                                const wrapperHeight = lyricsWrapper.clientHeight;
+                                lyricsWrapper.scrollTop = lineTop - (wrapperHeight / 2) + (activeLine.clientHeight / 2);
+                            }
+                        }
+                    }
+                }
+                
+                // Continue updating
+                requestAnimationFrame(updateLyrics);
+            }
+            
+            // Start tracking lyrics when music plays
+            backgroundMusic.addEventListener('play', function() {
+                updateLyrics();
+            });
+            
+            // Modify the music toggle to also handle lyrics visibility
+            musicToggle.addEventListener('click', function() {
+                const musicEnabled = this.textContent.includes('Music On');
+                if (musicEnabled && !lyricsShown) {
+                    lyricsShown = true;
+                    lyricsContainer.style.display = 'block';
+                    lyricsToggle.textContent = '🎵 Hide Lyrics';
+                } else if (!musicEnabled) {
+                    lyricsShown = false;
+                    lyricsContainer.style.display = 'none';
+                    lyricsToggle.textContent = '🎵 Show Lyrics';
+                }
+            });
         });
     </script>
 </body>
