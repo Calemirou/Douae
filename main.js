@@ -1,9 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Detect mobile device
-function isMobileDevice() {
-    return (window.innerWidth <= 768 || 
-            navigator.userAgent.match(/iPhone|iPad|iPod|Android|BlackBerry|Opera Mini|IEMobile/i));
-}
 // Set scale factors based on device
 const scaleFactor = isMobileDevice() ? 0.6 : 1;
 const positionOffset = isMobileDevice() ? 50 : 0;
