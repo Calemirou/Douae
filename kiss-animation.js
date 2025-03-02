@@ -12,8 +12,10 @@ function performKissAnimation() {
     amine.style.transition = 'left 1s ease-in-out';
     douae.style.transition = 'right 1s ease-in-out';
     
-    amine.style.left = 'calc(50% - 85px)';
-    douae.style.right = 'calc(50% - 85px)';
+    // Apply scale factors here
+    const centerOffset = 85 * scaleFactor;
+    amine.style.left = `calc(50% - ${centerOffset}px)`;
+    douae.style.right = `calc(50% - ${centerOffset}px)`;
     
     // Wait for characters to get in position
     setTimeout(() => {
