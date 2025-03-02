@@ -23,12 +23,18 @@ document.addEventListener('DOMContentLoaded', function() {
     function initCharacters() {
         if (!amine || !douae) return;
         
-        // Set initial positions to be centered at the bottom
+        // Make sure both characters are visible immediately
+        amine.style.opacity = '1';
+        douae.style.opacity = '1';
+        
+        // Set positions for characters to be centered at the bottom
         amine.style.left = '42%';
         amine.style.bottom = '5%';
+        amine.style.transform = 'translateX(-60px)';
         
         douae.style.right = '42%';
         douae.style.bottom = '5%';
+        douae.style.transform = 'translateX(60px)';
         
         // Make sure images have proper sizing
         if (amineImg && douaeImg) {
@@ -36,11 +42,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 maxHeight: '180px',
                 width: 'auto',
                 display: 'block',
-                filter: 'drop-shadow(0 5px 10px rgba(0,0,0,0.3))'
+                filter: 'drop-shadow(0 5px 10px rgba(0,0,0,0.3))',
+                transition: 'transform 0.5s ease'
             };
             
             Object.assign(amineImg.style, imageStyle);
             Object.assign(douaeImg.style, imageStyle);
+            
+            // Add a slight initial pose
+            setTimeout(() => {
+                amineImg.style.transform = 'rotate(5deg)';
+                douaeImg.style.transform = 'rotate(-5deg)';
+                
+                // Then, create an initial heart effect
+                setTimeout(() => {
+                    createHeartEffect();
+                }, 500);
+            }, 200);
         }
     }
     
@@ -52,8 +70,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const amineRect = amine.getBoundingClientRect();
         const douaeRect = douae.getBoundingClientRect();
         
-        const centerX = (amineRect.left + douaeRect.right) / 2;
-        const centerY = (amineRect.top + douaeRect.top) / 2 - 30;
+        // Fixed center position calculation that works regardless of character position
+        let centerX = window.innerWidth / 2;
+        let centerY = Math.min(amineRect.top, douaeRect.top) - 30;
+        
+        // If characters are visible, calculate position between them
+        if (amineRect.width && douaeRect.width) {
+            centerX = (amineRect.left + amineRect.width/2 + douaeRect.left + douaeRect.width/2) / 2;
+        }
         
         // Create heart
         const heart = document.createElement('div');
@@ -64,24 +88,24 @@ document.addEventListener('DOMContentLoaded', function() {
         heart.style.fontSize = '0px';
         heart.style.opacity = '0';
         heart.style.transform = 'translate(-50%, -50%)';
-        heart.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+        heart.style.transition = 'all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
         heart.style.zIndex = '100';
         
         document.body.appendChild(heart);
         
-        // Animate heart
+        // Animate heart with improved animation
         setTimeout(() => {
             heart.style.fontSize = '30px';
             heart.style.opacity = '1';
             
             setTimeout(() => {
-                heart.style.top = `${centerY - 50}px`;
+                heart.style.top = `${centerY - 80}px`;
                 heart.style.opacity = '0';
                 
                 setTimeout(() => {
                     heart.remove();
-                }, 500);
-            }, 800);
+                }, 800);
+            }, 1200);
         }, 10);
     }
     
@@ -269,16 +293,15 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!amine || !douae || !amineImg || !douaeImg || specialMomentActive) return;
         specialMomentActive = true;
         
-        // Save current positions
-        const currentAmineLeft = amine.style.left || '42%';
-        const currentDouaeRight = douae.style.right || '42%';
+        // Create a romantic background effect
+        createRomanticBackgroundEffect();
         
-        // Make characters move closer
-        amine.style.transition = 'left 2s ease-in-out';
-        amine.style.left = 'calc(50% - 70px)';
+        // Make characters move in a romantic dance pattern
+        amine.style.transition = 'all 2s ease-in-out';
+        amine.style.transform = 'translateX(-30px)';
         
-        douae.style.transition = 'right 2s ease-in-out';
-        douae.style.right = 'calc(50% - 70px)';
+        douae.style.transition = 'all 2s ease-in-out';
+        douae.style.transform = 'translateX(30px)';
         
         // Start heart effect interval
         heartInterval = setInterval(createHeartEffect, 800);
@@ -287,44 +310,111 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             // Lean toward each other
             amineImg.style.transition = 'transform 1.5s ease-out';
-            amineImg.style.transform = 'rotate(15deg) translateX(15px)';
+            amineImg.style.transform = 'rotate(15deg) translateX(15px) scale(1.05)';
             
             douaeImg.style.transition = 'transform 1.5s ease-out';
-            douaeImg.style.transform = 'rotate(-15deg) translateX(-15px)';
+            douaeImg.style.transform = 'rotate(-15deg) translateX(-15px) scale(1.05)';
             
             // Create special glow effect
             createCharacterGlow(amine, 'rgba(135, 206, 235, 0.6)');
             createCharacterGlow(douae, 'rgba(255, 105, 180, 0.6)');
             
+            // Create a "moment" effect with multiple hearts
+            setTimeout(() => {
+                // Create a burst of hearts
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => {
+                        createHeartEffect();
+                    }, i * 200);
+                }
+                
+                // Make characters do a special animation
+                setTimeout(() => {
+                    // Slight bounce effect
+                    amineImg.style.transition = 'transform 0.5s ease-out';
+                    amineImg.style.transform = 'scale(1.1) translateY(-10px)';
+                    
+                    douaeImg.style.transition = 'transform 0.5s ease-out';
+                    douaeImg.style.transform = 'scale(1.1) translateY(-10px)';
+                    
+                    setTimeout(() => {
+                        amineImg.style.transform = 'rotate(15deg) translateX(15px) scale(1.05)';
+                        douaeImg.style.transform = 'rotate(-15deg) translateX(-15px) scale(1.05)';
+                    }, 500);
+                }, 800);
+            }, 1500);
+            
             // Reset after special moment
             setTimeout(() => {
-                // Return to original positions
-                amine.style.left = currentAmineLeft;
-                douae.style.right = currentDouaeRight;
+                // Fade out background effect
+                const bgEffect = document.querySelector('.romantic-background');
+                if (bgEffect) {
+                    bgEffect.style.opacity = '0';
+                    setTimeout(() => bgEffect.remove(), 1000);
+                }
                 
-                // Reset transformations
-                amineImg.style.transition = 'transform 1s ease-out';
-                amineImg.style.transform = '';
+                // Reset character positions with a smooth transition
+                amine.style.transition = 'all 2s ease-in-out';
+                amine.style.transform = 'translateX(-60px)';
                 
-                douaeImg.style.transition = 'transform 1s ease-out';
-                douaeImg.style.transform = '';
+                douae.style.transition = 'all 2s ease-in-out';
+                douae.style.transform = 'translateX(60px)';
                 
-                // Remove character glows
-                const glows = document.querySelectorAll('.character-glow');
-                glows.forEach(glow => {
-                    glow.style.opacity = '0';
-                    setTimeout(() => glow.remove(), 1000);
-                });
-                
-                // Clear heart interval
-                clearInterval(heartInterval);
-                
-                // Reset special moment flag after delay
+                // Reset image transformations
                 setTimeout(() => {
-                    specialMomentActive = false;
-                }, 2000);
-            }, 4000);
-        }, 2000);
+                    amineImg.style.transition = 'transform 1s ease-out';
+                    amineImg.style.transform = 'rotate(5deg)';
+                    
+                    douaeImg.style.transition = 'transform 1s ease-out';
+                    douaeImg.style.transform = 'rotate(-5deg)';
+                    
+                    // Remove character glows
+                    const glows = document.querySelectorAll('.character-glow');
+                    glows.forEach(glow => {
+                        glow.style.opacity = '0';
+                        setTimeout(() => glow.remove(), 1000);
+                    });
+                    
+                    // Clear heart interval
+                    clearInterval(heartInterval);
+                    
+                    // Reset special moment flag after delay
+                    setTimeout(() => {
+                        specialMomentActive = false;
+                    }, 2000);
+                }, 1000);
+            }, 5000);
+        }, 1500);
+    }
+    
+    // Create a romantic background effect
+    function createRomanticBackgroundEffect() {
+        const bgEffect = document.createElement('div');
+        bgEffect.className = 'romantic-background';
+        bgEffect.style.position = 'fixed';
+        bgEffect.style.top = '0';
+        bgEffect.style.left = '0';
+        bgEffect.style.width = '100%';
+        bgEffect.style.height = '100%';
+        bgEffect.style.background = 'radial-gradient(circle at center, rgba(255,192,203,0.2) 0%, transparent 70%)';
+        bgEffect.style.opacity = '0';
+        bgEffect.style.transition = 'opacity 2s ease';
+        bgEffect.style.zIndex = '5';
+        bgEffect.style.pointerEvents = 'none';
+        
+        document.body.appendChild(bgEffect);
+        
+        // Calculate position to focus on characters
+        const container = document.querySelector('.characters-container');
+        if (container) {
+            const rect = container.getBoundingClientRect();
+            bgEffect.style.backgroundPosition = `center ${rect.top + 100}px`;
+        }
+        
+        // Fade in
+        setTimeout(() => {
+            bgEffect.style.opacity = '1';
+        }, 100);
     }
     
     // Create glow effect around a character
@@ -395,6 +485,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (danceInterval) {
             clearInterval(danceInterval);
         }
+        
+        // Start with a romantic moment right away
+        setTimeout(danceSpecialMoment, 1000);
         
         // Dance every 2.4 seconds (aligned to common music beats)
         danceInterval = setInterval(performDance, 2400);
