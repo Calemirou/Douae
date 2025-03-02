@@ -12,6 +12,9 @@ function performKissAnimation() {
     amine.style.transition = 'left 1s ease-in-out';
     douae.style.transition = 'right 1s ease-in-out';
     
+    amine.style.left = 'calc(50% - 85px)';
+    douae.style.right = 'calc(50% - 85px)';
+    
     // Wait for characters to get in position
     setTimeout(() => {
         // Create heart between them
