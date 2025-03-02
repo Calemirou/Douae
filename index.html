@@ -469,88 +469,7 @@
         /* Pause animation to show reaction */
         .paused img {
             animation-play-state: paused;
-        }
-/* Character dancing animation */
-@keyframes dance {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    25% { transform: translateY(-15px) rotate(5deg); }
-    50% { transform: translateY(0) rotate(0deg); }
-    75% { transform: translateY(-15px) rotate(-5deg); }
-}
-
-.dancing img {
-    animation: dance 1s infinite;
-}
-
-/* Enhanced jump animation */
-@keyframes jump {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-40px) scale(1.1); }
-}
-
-.jumping img {
-    animation: jump 0.8s ease-in-out;
-}
-
-/* Heart trail animation */
-.heart-trail {
-    position: absolute;
-    font-size: 24px;
-    z-index: 19;
-    animation: trailFloat 2s forwards;
-    opacity: 0.8;
-    pointer-events: none;
-}
-
-@keyframes trailFloat {
-    0% { opacity: 0.8; transform: translateY(0) scale(0.8); }
-    100% { opacity: 0; transform: translateY(-50px) scale(0.3); }
-}
-
-/* Heart burst effect */
-.heart-burst {
-    position: absolute;
-    font-size: 24px;
-    z-index: 19;
-    animation: burstFloat 2s forwards;
-    pointer-events: none;
-}
-
-@keyframes burstFloat {
-    0% { opacity: 0; transform: scale(0); }
-    10% { opacity: 1; transform: scale(1.2); }
-    30% { opacity: 1; transform: scale(1); }
-    100% { opacity: 0; transform: scale(0.3); }
-}
-
-/* Improve character emotion displays */
-.gift.visible, .reaction.visible {
-    animation: popUp 0.5s forwards, float 2s infinite ease-in-out;
-}
-
-@keyframes popUp {
-    0% { opacity: 0; transform: translateX(-50%) scale(0); }
-    70% { opacity: 1; transform: translateX(-50%) scale(1.2); }
-    100% { opacity: 1; transform: translateX(-50%) scale(1); }
-}
-
-@keyframes float {
-    0% { transform: translateY(0) translateX(-50%); }
-    50% { transform: translateY(-15px) translateX(-50%); }
-    100% { transform: translateY(0) translateX(-50%); }
-}
-
-/* Enhanced happy-meeting animation */
-@keyframes happy-bounce {
-    0%, 100% { transform: scale(1); }
-    30% { transform: scale(1.2); }
-    60% { transform: scale(0.9); }
-    80% { transform: scale(1.05); }
-}
-
-.happy-meeting img {
-    animation: happy-bounce 0.6s;
-}		
+        }				 
     </style>
 </head>
 <body>
@@ -597,632 +516,83 @@
     </audio>
     
     <script>
-// Characters animation
-const amineChar = document.getElementById('amine');
-const douaeChar = document.getElementById('douae');
-let charactersVisible = false;
-let animationPhase = 0;
-const songDuration = 211000; // 3m31s in milliseconds
-
-// Make sure characters start in correct positions
-amineChar.style.left = "-150px";
-douaeChar.style.right = "-150px";
-
-// Start character animation after a delay
-setTimeout(startCharacterAnimation, 3000);
-
-function startCharacterAnimation() {
-    // Add walking class to both characters
-    amineChar.classList.add('walking');
-    douaeChar.classList.add('walking');
-    
-    // Start the first phase of animation
-    startAnimationSequence();
-    charactersVisible = true;
-}
-
-function startAnimationSequence() {
-    // This function will manage the entire animation sequence
-    // and loop it for the duration of the song
-    
-    // Phase 0: Initial walking toward each other
-    const initialWalkDuration = 5000;
-    
-    // Animate Amine walking in from left
-    amineChar.animate(
-        [
-            { left: '-150px' },
-            { left: '30%' }
-        ],
-        {
-            duration: initialWalkDuration,
-            fill: 'forwards',
-            easing: 'ease-in-out'
-        }
-    );
-    
-    // Animate Douae walking in from right
-    douaeChar.animate(
-        [
-            { right: '-150px' },
-            { right: '30%' }
-        ],
-        {
-            duration: initialWalkDuration,
-            fill: 'forwards',
-            easing: 'ease-in-out'
-        }
-    );
-    
-    // When both characters meet, show gifts and reactions
-    setTimeout(() => {
-        // Stop walking
-        amineChar.classList.remove('walking');
-        douaeChar.classList.remove('walking');
-        
-        // Show gift - flower
-        const flowerGift = amineChar.querySelector('.gift.flower');
-        flowerGift.classList.remove('hidden');
-        flowerGift.classList.add('visible');
-        
-        // After receiving gift, show reaction
-        setTimeout(() => {
-            const loveReaction = douaeChar.querySelector('.reaction.love');
-            loveReaction.classList.remove('hidden');
-            loveReaction.classList.add('visible');
+        document.addEventListener("DOMContentLoaded", function() {
+            // Background music setup
+            const backgroundMusic = document.getElementById('backgroundMusic');
+            backgroundMusic.volume = 0.5;
+            let musicEnabled = true;
             
-            // Make the reaction float
-            loveReaction.classList.add('floating');
+            // Characters animation
+            const amineChar = document.getElementById('amine');
+            const douaeChar = document.getElementById('douae');
+            let charactersVisible = false;
             
-            // Both characters happy bounce animation
-            amineChar.classList.add('happy-meeting');
-            douaeChar.classList.add('happy-meeting');
+            // Make sure characters start in correct positions
+            amineChar.style.left = "-150px";
+            douaeChar.style.right = "-150px";
             
-            // Start phases of romantic interactions
-            continueRomanticSequence();
-        }, 1000);
-    }, initialWalkDuration);
-}
-
-function continueRomanticSequence() {
-    // This function orchestrates the continuous romantic animations
-    // and ensure they loop throughout the song
-    
-    // Setup a sequence of animations that will repeat
-    const animations = [
-        circleAroundAnimation,
-        heartGiftAnimation,
-        danceTogether,
-        moonlightWalk,
-        jumpTogetherAnimation,
-        separateAndReuniteAnimation
-    ];
-    
-    // Run each animation in sequence
-    runAnimationSequence(animations, 0);
-}
-
-function runAnimationSequence(animations, index) {
-    // Get current animation
-    const currentAnimation = animations[index];
-    
-    // Run the current animation
-    currentAnimation(() => {
-        // When complete, advance to next animation or loop back to beginning
-        const nextIndex = (index + 1) % animations.length;
-        runAnimationSequence(animations, nextIndex);
-    });
-}
-
-// Animation 1: Circle around each other
-function circleAroundAnimation(callback) {
-    // Reset any previous reactions
-    resetReactions();
-    
-    // Add walking class for movement
-    amineChar.classList.add('walking');
-    douaeChar.classList.add('walking');
-    
-    // Create circle path for Amine around Douae
-    const duration = 8000;
-    const centerX = parseFloat(window.getComputedStyle(douaeChar).left) || window.innerWidth * 0.6;
-    const centerY = parseFloat(window.getComputedStyle(douaeChar).top) || window.innerHeight * 0.7;
-    const radius = 100;
-    let startTime = null;
-    
-    function animateCircle(timestamp) {
-        if (!startTime) startTime = timestamp;
-        const elapsed = timestamp - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        
-        // Calculate position on circle
-        const angle = progress * Math.PI * 2;
-        const x = centerX + radius * Math.cos(angle);
-        const y = centerY + radius * Math.sin(angle) * 0.3; // Flatten the circle to account for perspective
-        
-        // Apply position
-        amineChar.style.left = `${x}px`;
-        amineChar.style.top = `${y}px`;
-        
-        // Make character face the center of circle
-        if (angle > Math.PI) {
-            amineChar.style.transform = 'scaleX(-1)'; // Facing left
-        } else {
-            amineChar.style.transform = 'scaleX(1)'; // Facing right
-        }
-        
-        // Continue animation if not complete
-        if (progress < 1) {
-            requestAnimationFrame(animateCircle);
-        } else {
-            amineChar.style.transform = 'scaleX(1)'; // Reset direction
+            // Start character animation after a delay
+            setTimeout(startCharacterAnimation, 3000);
             
-            // Show surprise reaction from Douae
-            const surpriseReaction = douaeChar.querySelector('.reaction.surprise');
-            surpriseReaction.classList.remove('hidden');
-            surpriseReaction.classList.add('visible', 'floating');
-            
-            // Proceed to next animation after a delay
-            setTimeout(callback, 2000);
-        }
-    }
-    
-    requestAnimationFrame(animateCircle);
-}
-
-// Animation 2: Heart gift animation
-function heartGiftAnimation(callback) {
-    // Reset reactions
-    resetReactions();
-    
-    // Stop walking
-    amineChar.classList.remove('walking');
-    douaeChar.classList.remove('walking');
-    
-    // Move Amine closer to Douae
-    amineChar.animate(
-        [
-            { left: amineChar.style.left },
-            { left: 'calc(70% - 100px)' }
-        ],
-        {
-            duration: 2000,
-            fill: 'forwards',
-            easing: 'ease-in-out'
-        }
-    );
-    
-    // Wait for Amine to move closer
-    setTimeout(() => {
-        // Jump animation for Amine
-        amineChar.classList.add('jumping');
-        
-        // Show heart gift
-        const heartGift = amineChar.querySelector('.gift.heart');
-        heartGift.classList.remove('hidden');
-        heartGift.classList.add('visible', 'floating');
-        
-        // Show happy reaction from Douae after receiving heart
-        setTimeout(() => {
-            const happyReaction = douaeChar.querySelector('.reaction.happy');
-            happyReaction.classList.remove('hidden');
-            happyReaction.classList.add('visible', 'floating');
-            
-            // Douae jumps with joy
-            douaeChar.classList.add('jumping');
-            
-            // Create heart trail between characters
-            createHeartTrail();
-            
-            // Remove jumping class after animation completes
-            setTimeout(() => {
-                amineChar.classList.remove('jumping');
-                douaeChar.classList.remove('jumping');
+            function startCharacterAnimation() {
+                // Add walking class to both characters
+                amineChar.classList.add('walking');
+                douaeChar.classList.add('walking');
                 
-                // Continue to next animation
-                setTimeout(callback, 2000);
-            }, 1000);
-        }, 1500);
-    }, 2000);
-}
-
-// Create heart trail between characters
-function createHeartTrail() {
-    const amineRect = amineChar.getBoundingClientRect();
-    const douaeRect = douaeChar.getBoundingClientRect();
-    
-    const startX = amineRect.left + amineRect.width / 2;
-    const startY = amineRect.top + amineRect.height / 3;
-    const endX = douaeRect.left + douaeRect.width / 2;
-    const endY = douaeRect.top + douaeRect.height / 3;
-    
-    // Create 10 hearts along the path
-    for (let i = 0; i < 10; i++) {
-        setTimeout(() => {
-            const progress = i / 9;
-            const x = startX + (endX - startX) * progress;
-            const y = startY + (endY - startY) * progress - 
-                     20 * Math.sin(progress * Math.PI); // Arc upward
-            
-            const heart = document.createElement('div');
-            heart.classList.add('heart-trail');
-            heart.innerHTML = '❤️';
-            heart.style.left = `${x}px`;
-            heart.style.top = `${y}px`;
-            document.body.appendChild(heart);
-            
-            // Remove heart after animation completes
-            setTimeout(() => {
-                heart.remove();
-            }, 2000);
-        }, i * 100);
-    }
-}
-
-// Animation 3: Dance together
-function danceTogether(callback) {
-    // Reset reactions
-    resetReactions();
-    
-    // Position characters side by side
-    amineChar.animate(
-        [
-            { left: amineChar.style.left },
-            { left: 'calc(50% - 100px)' }
-        ],
-        {
-            duration: 1000,
-            fill: 'forwards'
-        }
-    );
-    
-    douaeChar.animate(
-        [
-            { right: douaeChar.style.right },
-            { right: 'calc(50% - 100px)' }
-        ],
-        {
-            duration: 1000,
-            fill: 'forwards'
-        }
-    );
-    
-    // Wait for positioning to complete
-    setTimeout(() => {
-        // Add dancing animation class (we'll define this in CSS)
-        amineChar.classList.add('dancing');
-        douaeChar.classList.add('dancing');
-        
-        // Dance for 6 seconds
-        setTimeout(() => {
-            // Stop dancing
-            amineChar.classList.remove('dancing');
-            douaeChar.classList.remove('dancing');
-            
-            // Move to next animation
-            callback();
-        }, 6000);
-    }, 1000);
-    
-    // Create hearts above them while dancing
-    const intervalId = setInterval(() => {
-        const amineRect = amineChar.getBoundingClientRect();
-        const douaeRect = douaeChar.getBoundingClientRect();
-        
-        const centerX = (amineRect.left + douaeRect.left + amineRect.width) / 2;
-        const centerY = Math.min(amineRect.top, douaeRect.top) - 30;
-        
-        createHeartParticle(centerX, centerY);
-    }, 500);
-    
-    // Stop creating hearts after dance ends
-    setTimeout(() => {
-        clearInterval(intervalId);
-    }, 7000);
-}
-
-// Animation 4: Moonlight walk
-function moonlightWalk(callback) {
-    // Reset reactions
-    resetReactions();
-    
-    // Add walking animation
-    amineChar.classList.add('walking');
-    douaeChar.classList.add('walking');
-    
-    // Move them slowly across the screen together
-    const duration = 8000;
-    
-    amineChar.animate(
-        [
-            { left: amineChar.style.left },
-            { left: '-100px' }
-        ],
-        {
-            duration: duration,
-            fill: 'forwards',
-            easing: 'linear'
-        }
-    );
-    
-    douaeChar.animate(
-        [
-            { right: douaeChar.style.right },
-            { right: '-100px' }
-        ],
-        {
-            duration: duration,
-            fill: 'forwards',
-            easing: 'linear'
-        }
-    );
-    
-    // After walking off screen, reposition for next animation
-    setTimeout(() => {
-        // Stop walking animation
-        amineChar.classList.remove('walking');
-        douaeChar.classList.remove('walking');
-        
-        // Reset positions instantly (off-screen)
-        amineChar.style.left = '-150px';
-        douaeChar.style.right = '-150px';
-        
-        // Start walking animation again
-        amineChar.classList.add('walking');
-        douaeChar.classList.add('walking');
-        
-        // Walk back on screen
-        amineChar.animate(
-            [
-                { left: '-150px' },
-                { left: '30%' }
-            ],
-            {
-                duration: 3000,
-                fill: 'forwards',
-                easing: 'ease-in-out'
-            }
-        );
-        
-        douaeChar.animate(
-            [
-                { right: '-150px' },
-                { right: '30%' }
-            ],
-            {
-                duration: 3000,
-                fill: 'forwards',
-                easing: 'ease-in-out'
-            }
-        );
-        
-        // Continue to next animation after walking back on screen
-        setTimeout(callback, 3000);
-    }, duration);
-}
-
-// Animation 5: Jump together animation
-function jumpTogetherAnimation(callback) {
-    // Reset reactions
-    resetReactions();
-    
-    // Stop walking
-    amineChar.classList.remove('walking');
-    douaeChar.classList.remove('walking');
-    
-    // Position characters side by side if needed
-    amineChar.animate(
-        [
-            { left: amineChar.style.left },
-            { left: 'calc(50% - 100px)' }
-        ],
-        {
-            duration: 1000,
-            fill: 'forwards'
-        }
-    );
-    
-    douaeChar.animate(
-        [
-            { right: douaeChar.style.right },
-            { right: 'calc(50% - 100px)' }
-        ],
-        {
-            duration: 1000,
-            fill: 'forwards'
-        }
-    );
-    
-    // Wait for positioning
-    setTimeout(() => {
-        // Jump together
-        amineChar.classList.add('jumping');
-        douaeChar.classList.add('jumping');
-        
-        // Show gift box
-        const giftBox = amineChar.querySelector('.gift.gift-box');
-        giftBox.classList.remove('hidden');
-        giftBox.classList.add('visible', 'floating');
-        
-        // Create large heart burst after gift
-        setTimeout(() => {
-            createHeartBurst();
-            
-            // Show love reaction
-            const loveReaction = douaeChar.querySelector('.reaction.love');
-            loveReaction.classList.remove('hidden');
-            loveReaction.classList.add('visible', 'floating');
-            
-            // Remove jumping class
-            setTimeout(() => {
-                amineChar.classList.remove('jumping');
-                douaeChar.classList.remove('jumping');
+                // Animate Amine walking in from left
+                const amineAnim = amineChar.animate(
+                    [
+                        { left: '-150px' },
+                        { left: '30%' }
+                    ],
+                    {
+                        duration: 5000,
+                        fill: 'forwards',
+                        easing: 'ease-in-out'
+                    }
+                );
                 
-                // Move to next animation
-                setTimeout(callback, 2000);
-            }, 1000);
-        }, 1000);
-    }, 1000);
-}
-
-// Create heart burst effect
-function createHeartBurst() {
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2 - 100;
-    
-    // Create 20 hearts in all directions
-    for (let i = 0; i < 20; i++) {
-        setTimeout(() => {
-            const angle = (i / 20) * Math.PI * 2;
-            const distance = 150;
-            const x = centerX + Math.cos(angle) * distance * 0.3;
-            const y = centerY + Math.sin(angle) * distance;
-            
-            createHeartParticle(x, y);
-        }, i * 50);
-    }
-}
-
-// Animation 6: Separate and reunite
-function separateAndReuniteAnimation(callback) {
-    // Reset reactions
-    resetReactions();
-    
-    // Add walking animation
-    amineChar.classList.add('walking');
-    douaeChar.classList.add('walking');
-    
-    // Move characters apart
-    amineChar.animate(
-        [
-            { left: amineChar.style.left },
-            { left: '10%' }
-        ],
-        {
-            duration: 3000,
-            fill: 'forwards'
-        }
-    );
-    
-    douaeChar.animate(
-        [
-            { right: douaeChar.style.right },
-            { right: '10%' }
-        ],
-        {
-            duration: 3000,
-            fill: 'forwards'
-        }
-    );
-    
-    // Wait for separation
-    setTimeout(() => {
-        // Turn characters to face each other
-        amineChar.style.transform = 'scaleX(1)'; // Face right
-        douaeChar.style.transform = 'scaleX(-1)'; // Face left
-        
-        // Pause briefly while separated
-        setTimeout(() => {
-            // Both characters run toward each other
-            amineChar.animate(
-                [
-                    { left: '10%' },
-                    { left: '40%' }
-                ],
-                {
-                    duration: 2000,
-                    fill: 'forwards',
-                    easing: 'ease-in'
-                }
-            );
-            
-            douaeChar.animate(
-                [
-                    { right: '10%' },
-                    { right: '40%' }
-                ],
-                {
-                    duration: 2000,
-                    fill: 'forwards',
-                    easing: 'ease-in'
-                }
-            );
-            
-            // When they meet
-            setTimeout(() => {
-                // Stop walking
-                amineChar.classList.remove('walking');
-                douaeChar.classList.remove('walking');
+                // Animate Douae walking in from right
+                const douaeAnim = douaeChar.animate(
+                    [
+                        { right: '-150px' },
+                        { right: '30%' }
+                    ],
+                    {
+                        duration: 5000,
+                        fill: 'forwards',
+                        easing: 'ease-in-out'
+                    }
+                );
                 
-                // Jump with joy
-                amineChar.classList.add('jumping');
-                douaeChar.classList.add('jumping');
-                
-                // Show love reactions
-                const loveReaction = douaeChar.querySelector('.reaction.love');
-                loveReaction.classList.remove('hidden');
-                loveReaction.classList.add('visible', 'floating');
-                
-                // Heart trail between them
-                createHeartTrail();
-                
-                // Proceed to next animation
+                // When both characters meet, show gifts and reactions
                 setTimeout(() => {
-                    amineChar.classList.remove('jumping');
-                    douaeChar.classList.remove('jumping');
-                    callback();
-                }, 2000);
-            }, 2000);
-        }, 1000);
-    }, 3000);
-}
-
-// Reset all reactions and gifts to hidden
-function resetReactions() {
-    // Hide all gifts from Amine
-    Array.from(amineChar.querySelectorAll('.gift')).forEach(gift => {
-        gift.classList.remove('visible', 'floating');
-        gift.classList.add('hidden');
-    });
-    
-    // Hide all reactions from Douae
-    Array.from(douaeChar.querySelectorAll('.reaction')).forEach(reaction => {
-        reaction.classList.remove('visible', 'floating');
-        reaction.classList.add('hidden');
-    });
-}
-
-// Add this CSS for new animations
-const style = document.createElement('style');
-style.textContent = `
-/* Dancing animation */
-@keyframes dance {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    25% { transform: translateY(-15px) rotate(5deg); }
-    50% { transform: translateY(0) rotate(0deg); }
-    75% { transform: translateY(-15px) rotate(-5deg); }
-}
-
-.dancing img {
-    animation: dance 1s infinite;
-}
-
-/* Heart burst effect */
-.heart-burst {
-    position: absolute;
-    font-size: 24px;
-    z-index: 19;
-    animation: burstFloat 2s forwards;
-}
-
-@keyframes burstFloat {
-    0% { opacity: 0; transform: scale(0); }
-    10% { opacity: 1; transform: scale(1.2); }
-    30% { opacity: 1; transform: scale(1); }
-    100% { opacity: 0; transform: scale(0.3); }
-}
-`;
-document.head.appendChild(style);
+                    // Stop walking
+                    amineChar.classList.remove('walking');
+                    douaeChar.classList.remove('walking');
+                    
+                    // Show gift
+                    const flowerGift = amineChar.querySelector('.gift.flower');
+                    flowerGift.classList.remove('hidden');
+                    flowerGift.classList.add('visible');
+                    
+                    // After receiving gift, show reaction
+                    setTimeout(() => {
+                        const loveReaction = douaeChar.querySelector('.reaction.love');
+                        loveReaction.classList.remove('hidden');
+                        loveReaction.classList.add('visible');
+                        
+                        // Make the reaction float
+                        loveReaction.classList.add('floating');
+                    }, 1000);
+                    
+                    // Both characters happy bounce animation
+                    amineChar.classList.add('happy-meeting');
+                    douaeChar.classList.add('happy-meeting');
+                    
+                    charactersVisible = true;
+                }, 5000);
+            }
             
             // Need user interaction to start audio
             document.addEventListener('click', function() {
