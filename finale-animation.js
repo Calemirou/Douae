@@ -13,6 +13,9 @@ function performFinaleAnimation() {
     amine.style.transition = 'left 1s ease-in-out';
     douae.style.transition = 'right 1s ease-in-out';
     
+    amine.style.left = 'calc(50% - 100px)';
+    douae.style.right = 'calc(50% - 100px)';
+    
     // Create fireworks effect
     createFireworks();
     
