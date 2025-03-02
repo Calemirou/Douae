@@ -15,328 +15,352 @@ document.addEventListener('DOMContentLoaded', function() {
     const WINDOW_HEIGHT = window.innerHeight;
     const SONG_DURATION = 211000; // 3 minutes 31 seconds
     
-    // Romantic Animation Scenario
-    function createRomanticScenario() {
+    // Unique Meeting Story Animation
+    function createUniqueStory() {
         // Reset initial positions
-        amine.style.left = '-150px';
-        douae.style.right = '-150px';
+        amine.style.left = '-250px';
+        douae.style.right = '-250px';
         
-        // Sequence of romantic moments
-        const timeline = [
+        // Story sequence of moments
+        const storyline = [
             {
-                action: moveCharactersIn,
+                action: adventureStart,
                 delay: 2000
             },
             {
-                action: firstGlance,
-                delay: 5000
+                action: unexpectedEncounter,
+                delay: 8000
             },
             {
-                action: approachEachOther,
-                delay: 10000
-            },
-            {
-                action: romanticDance,
+                action: playfulInteraction,
                 delay: 15000
             },
             {
-                action: closeIntimacy,
-                delay: 20000
+                action: sharedJourney,
+                delay: 22000
             },
             {
-                action: finalEmbrace,
-                delay: 25000
+                action: connectionMoment,
+                delay: 30000
+            },
+            {
+                action: finalChapter,
+                delay: 38000
             }
         ];
         
-        // Execute timeline
-        timeline.forEach(moment => {
+        // Execute storyline
+        storyline.forEach(moment => {
             setTimeout(moment.action, moment.delay);
         });
         
-        // Restart the scenario when song ends
-        setTimeout(createRomanticScenario, SONG_DURATION);
+        // Restart the story when song ends
+        setTimeout(createUniqueStory, SONG_DURATION);
     }
     
-    // Move characters into view
-    function moveCharactersIn() {
-        // Amine enters from left
-        amine.style.transition = 'left 3s ease-in-out';
-        amine.style.left = `${WINDOW_WIDTH * 0.25}px`;
+    // Adventure Start - Characters enter from opposite sides
+    function adventureStart() {
+        // Amine enters from left with adventure-like movement
+        amine.style.transition = 'left 4s cubic-bezier(0.45, 0, 0.55, 1)';
+        amine.style.left = `${WINDOW_WIDTH * 0.2}px`;
         amine.classList.add('walking');
         
-        // Douae enters from right
-        douae.style.transition = 'right 3s ease-in-out';
-        douae.style.right = `${WINDOW_WIDTH * 0.25}px`;
-        douae.classList.add('walking');
+        // Add explorer effect
+        amineImg.style.filter = 'drop-shadow(0 0 10px rgba(0,0,0,0.5))';
         
-        // Create heart trails
-        setTimeout(createHeartTrails, 2000);
+        // Create path elements
+        createAdventurePath(amine);
+        
+        // Douae enters from right with mysterious approach
+        setTimeout(() => {
+            douae.style.transition = 'right 4s cubic-bezier(0.45, 0, 0.55, 1)';
+            douae.style.right = `${WINDOW_WIDTH * 0.2}px`;
+            douae.classList.add('walking');
+            
+            // Add mystique effect
+            douaeImg.style.filter = 'brightness(0.9) contrast(1.2)';
+            
+            createMysteriousTrail(douae);
+        }, 2000);
     }
     
-    // First glance moment
-    function firstGlance() {
+    // Unexpected Encounter
+    function unexpectedEncounter() {
         // Stop walking
         amine.classList.remove('walking');
         douae.classList.remove('walking');
         
-        // Subtle romantic pose
-        amineImg.style.transform = 'rotate(5deg) scale(1.05)';
-        douaeImg.style.transform = 'rotate(-5deg) scale(1.05)';
+        // Surprised poses
+        amineImg.style.transform = 'rotate(15deg) scale(1.1)';
+        douaeImg.style.transform = 'rotate(-15deg) scale(1.1)';
         
-        // Create shy/loving expressions
+        // Create interaction zone
+        createInteractionZone();
+        
+        // Playful reaction elements
         setTimeout(() => {
-            createHeartConnection();
-            createSoftLighting();
-        }, 500);
-    }
-    
-    // Approach each other
-    function approachEachOther() {
-        // Move closer
-        amine.style.transition = 'left 2s ease-in-out';
-        amine.style.left = `${WINDOW_WIDTH * 0.4}px`;
-        
-        douae.style.transition = 'right 2s ease-in-out';
-        douae.style.right = `${WINDOW_WIDTH * 0.4}px`;
-        
-        // Gentle sway animation
-        setTimeout(() => {
-            amineImg.style.animation = 'gentle-sway 2s infinite alternate';
-            douaeImg.style.animation = 'gentle-sway 2s infinite alternate-reverse';
-            
-            // Create floating hearts
-            createFloatingHearts();
+            createSurpriseEffects();
         }, 1000);
     }
     
-    // Romantic dance
-    function romanticDance() {
+    // Playful Interaction
+    function playfulInteraction() {
+        // Move closer but not too close
+        amine.style.transition = 'left 3s ease-in-out';
+        amine.style.left = `${WINDOW_WIDTH * 0.35}px`;
+        
+        douae.style.transition = 'right 3s ease-in-out';
+        douae.style.right = `${WINDOW_WIDTH * 0.35}px`;
+        
+        // Playful animations
+        setTimeout(() => {
+            amineImg.style.animation = 'playful-bounce 1s infinite';
+            douaeImg.style.animation = 'playful-bounce 1s infinite alternate';
+            
+            // Create interactive elements
+            createPlayfulElements();
+        }, 2000);
+    }
+    
+    // Shared Journey
+    function sharedJourney() {
+        // Move towards center but maintain distance
+        amine.style.transition = 'left 4s ease-in-out';
+        amine.style.left = `${WINDOW_WIDTH * 0.4}px`;
+        
+        douae.style.transition = 'right 4s ease-in-out';
+        douae.style.right = `${WINDOW_WIDTH * 0.4}px`;
+        
         // Synchronized movement
+        setTimeout(() => {
+            amineImg.style.transform = 'rotate(5deg)';
+            douaeImg.style.transform = 'rotate(-5deg)';
+            
+            // Create journey visualization
+            createJourneyVisualization();
+        }, 2000);
+    }
+    
+    // Connection Moment
+    function connectionMoment() {
+        // Subtle approach
         amine.style.transition = 'left 3s ease-in-out';
         amine.style.left = `${WINDOW_WIDTH * 0.45}px`;
         
         douae.style.transition = 'right 3s ease-in-out';
         douae.style.right = `${WINDOW_WIDTH * 0.45}px`;
         
-        // Dance-like transformations
+        // Create connection visualization
         setTimeout(() => {
-            amineImg.style.transform = 'rotate(10deg) translateY(-10px)';
-            douaeImg.style.transform = 'rotate(-10deg) translateY(-10px)';
-            
-            // Heart burst effect
-            createIntenseHeartBurst();
-        }, 1500);
-    }
-    
-    // Close intimacy moment
-    function closeIntimacy() {
-        // Move very close
-        amine.style.transition = 'left 2s ease-in-out';
-        amine.style.left = `${WINDOW_WIDTH * 0.48}px`;
-        
-        douae.style.transition = 'right 2s ease-in-out';
-        douae.style.right = `${WINDOW_WIDTH * 0.48}px`;
-        
-        // Lean towards each other
-        setTimeout(() => {
-            amineImg.style.transform = 'rotate(15deg) scale(1.1)';
-            douaeImg.style.transform = 'rotate(-15deg) scale(1.1)';
-            
-            // Create romantic backdrop
-            createRomanticBackdrop();
-        }, 1000);
-    }
-    
-    // Final embrace
-    function finalEmbrace() {
-        // Almost touching
-        amine.style.transition = 'left 3s ease-in-out';
-        amine.style.left = `${WINDOW_WIDTH * 0.5 - 50}px`;
-        
-        douae.style.transition = 'right 3s ease-in-out';
-        douae.style.right = `${WINDOW_WIDTH * 0.5 - 50}px`;
-        
-        // Final loving pose
-        setTimeout(() => {
-            amineImg.style.transform = 'rotate(5deg) scale(1.05)';
-            douaeImg.style.transform = 'rotate(-5deg) scale(1.05)';
-            
-            // Ultimate heart effect
-            createFinalHeartMoment();
+            createConnectionEffects();
         }, 2000);
     }
     
-    // Helper functions for romantic effects
-    function createHeartTrails() {
-        const aminePos = amine.getBoundingClientRect();
-        const douaePos = douae.getBoundingClientRect();
+    // Final Chapter
+    function finalChapter() {
+        // Final positioning
+        amine.style.transition = 'left 4s ease-in-out';
+        amine.style.left = `${WINDOW_WIDTH * 0.48}px`;
         
-        function addHeartTrail(x, y) {
-            const heart = document.createElement('div');
-            heart.innerHTML = '❤️';
-            heart.style.position = 'fixed';
-            heart.style.left = `${x}px`;
-            heart.style.top = `${y}px`;
-            heart.style.fontSize = '20px';
-            heart.style.opacity = '0.7';
-            heart.style.animation = 'heart-trail 2s forwards';
-            document.body.appendChild(heart);
-            
-            setTimeout(() => heart.remove(), 2000);
-        }
+        douae.style.transition = 'right 4s ease-in-out';
+        douae.style.right = `${WINDOW_WIDTH * 0.48}px`;
         
-        // Create multiple heart trails
+        // Final moment visualization
+        setTimeout(() => {
+            createFinalMomentEffects();
+        }, 2000);
+    }
+    
+    // Helper Visualization Functions
+    function createAdventurePath(character) {
+        const path = document.createElement('div');
+        path.style.position = 'fixed';
+        path.style.bottom = '10%';
+        path.style.left = '0';
+        path.style.width = '100%';
+        path.style.height = '2px';
+        path.style.background = 'linear-gradient(to right, transparent, rgba(135,206,235,0.5), transparent)';
+        document.body.appendChild(path);
+        
+        setTimeout(() => path.remove(), 5000);
+    }
+    
+    function createMysteriousTrail(character) {
+        const trail = document.createElement('div');
+        trail.style.position = 'fixed';
+        trail.style.bottom = '10%';
+        trail.style.right = '0';
+        trail.style.width = '100%';
+        trail.style.height = '2px';
+        trail.style.background = 'linear-gradient(to left, transparent, rgba(255,105,180,0.5), transparent)';
+        document.body.appendChild(trail);
+        
+        setTimeout(() => trail.remove(), 5000);
+    }
+    
+    function createInteractionZone() {
+        const zone = document.createElement('div');
+        zone.style.position = 'fixed';
+        zone.style.top = '50%';
+        zone.style.left = '50%';
+        zone.style.transform = 'translate(-50%, -50%)';
+        zone.style.width = '200px';
+        zone.style.height = '200px';
+        zone.style.border = '2px dashed rgba(255,255,255,0.3)';
+        zone.style.borderRadius = '50%';
+        zone.style.pointerEvents = 'none';
+        document.body.appendChild(zone);
+        
+        setTimeout(() => zone.remove(), 3000);
+    }
+    
+    function createSurpriseEffects() {
+        // Create surprise elements
         for (let i = 0; i < 5; i++) {
+            const surprise = document.createElement('div');
+            surprise.innerHTML = '❓';
+            surprise.style.position = 'fixed';
+            surprise.style.top = `${Math.random() * WINDOW_HEIGHT}px`;
+            surprise.style.left = `${Math.random() * WINDOW_WIDTH}px`;
+            surprise.style.fontSize = `${Math.random() * 30 + 20}px`;
+            surprise.style.opacity = '0';
+            surprise.style.transition = 'all 1s ease';
+            document.body.appendChild(surprise);
+            
             setTimeout(() => {
-                addHeartTrail(
-                    aminePos.left + Math.random() * aminePos.width,
-                    aminePos.top + Math.random() * aminePos.height
-                );
-                addHeartTrail(
-                    douaePos.left + Math.random() * douaePos.width,
-                    douaePos.top + Math.random() * douaePos.height
-                );
-            }, i * 500);
+                surprise.style.opacity = '1';
+                surprise.style.transform = 'scale(1.5) rotate(360deg)';
+            }, i * 200);
+            
+            setTimeout(() => surprise.remove(), 2000);
         }
     }
     
-    function createHeartConnection() {
-        const aminePos = amine.getBoundingClientRect();
-        const douaePos = douae.getBoundingClientRect();
+    function createPlayfulElements() {
+        // Create bouncing playful elements
+        for (let i = 0; i < 10; i++) {
+            const element = document.createElement('div');
+            element.innerHTML = ['🎈', '🎉', '✨', '🌈'][Math.floor(Math.random() * 4)];
+            element.style.position = 'fixed';
+            element.style.top = `${Math.random() * WINDOW_HEIGHT}px`;
+            element.style.left = `${Math.random() * WINDOW_WIDTH}px`;
+            element.style.fontSize = `${Math.random() * 30 + 20}px`;
+            element.style.opacity = '0';
+            element.style.transition = 'all 1s ease';
+            document.body.appendChild(element);
+            
+            setTimeout(() => {
+                element.style.opacity = '1';
+                element.style.transform = 'scale(1.5) rotate(360deg)';
+            }, i * 200);
+            
+            setTimeout(() => element.remove(), 2000);
+        }
+    }
+    
+    function createJourneyVisualization() {
+        const journey = document.createElement('div');
+        journey.style.position = 'fixed';
+        journey.style.top = '0';
+        journey.style.left = '0';
+        journey.style.width = '100%';
+        journey.style.height = '100%';
+        journey.style.background = 'linear-gradient(45deg, rgba(135,206,235,0.2), rgba(255,105,180,0.2))';
+        journey.style.pointerEvents = 'none';
+        journey.style.opacity = '0';
+        journey.style.transition = 'opacity 2s ease';
+        document.body.appendChild(journey);
         
+        setTimeout(() => {
+            journey.style.opacity = '1';
+        }, 100);
+        
+        setTimeout(() => journey.remove(), 3000);
+    }
+    
+    function createConnectionEffects() {
+        // Create connection line
         const connection = document.createElement('div');
         connection.style.position = 'fixed';
-        connection.style.left = `${aminePos.right}px`;
-        connection.style.top = `${aminePos.top + aminePos.height/2}px`;
-        connection.style.width = `${douaePos.left - aminePos.right}px`;
+        connection.style.top = '50%';
+        connection.style.left = '0';
+        connection.style.width = '100%';
         connection.style.height = '2px';
-        connection.style.background = 'linear-gradient(to right, pink, red)';
-        connection.style.opacity = '0.5';
+        connection.style.background = 'linear-gradient(to right, transparent, rgba(255,105,180,0.7), transparent)';
+        connection.style.opacity = '0';
+        connection.style.transition = 'opacity 2s ease';
         document.body.appendChild(connection);
+        
+        setTimeout(() => {
+            connection.style.opacity = '1';
+        }, 100);
         
         setTimeout(() => connection.remove(), 3000);
     }
     
-    function createSoftLighting() {
-        const lighting = document.createElement('div');
-        lighting.style.position = 'fixed';
-        lighting.style.top = '0';
-        lighting.style.left = '0';
-        lighting.style.width = '100%';
-        lighting.style.height = '100%';
-        lighting.style.background = 'radial-gradient(circle, rgba(255,192,203,0.3) 0%, transparent 70%)';
-        lighting.style.zIndex = '1';
-        lighting.style.pointerEvents = 'none';
-        document.body.appendChild(lighting);
+    function createFinalMomentEffects() {
+        // Create final moment visualization
+        const finalMoment = document.createElement('div');
+        finalMoment.style.position = 'fixed';
+        finalMoment.style.top = '0';
+        finalMoment.style.left = '0';
+        finalMoment.style.width = '100%';
+        finalMoment.style.height = '100%';
+        finalMoment.style.background = 'radial-gradient(circle, rgba(255,105,180,0.3), rgba(135,206,235,0.3))';
+        finalMoment.style.opacity = '0';
+        finalMoment.style.transition = 'opacity 2s ease';
+        document.body.appendChild(finalMoment);
         
-        setTimeout(() => lighting.remove(), 3000);
-    }
-    
-    function createFloatingHearts() {
-        for (let i = 0; i < 10; i++) {
-            const heart = document.createElement('div');
-            heart.innerHTML = '❤️';
-            heart.style.position = 'fixed';
-            heart.style.left = `${Math.random() * WINDOW_WIDTH}px`;
-            heart.style.top = `${WINDOW_HEIGHT}px`;
-            heart.style.fontSize = `${Math.random() * 30 + 20}px`;
-            heart.style.animation = 'float-heart 3s forwards';
-            document.body.appendChild(heart);
-            
-            setTimeout(() => heart.remove(), 3000);
-        }
-    }
-    
-    function createIntenseHeartBurst() {
-        const aminePos = amine.getBoundingClientRect();
-        const douaePos = douae.getBoundingClientRect();
-        const centerX = (aminePos.left + douaePos.left) / 2;
-        const centerY = (aminePos.top + douaePos.top) / 2;
+        setTimeout(() => {
+            finalMoment.style.opacity = '1';
+        }, 100);
         
-        for (let i = 0; i < 20; i++) {
-            const heart = document.createElement('div');
-            heart.innerHTML = '❤️';
-            heart.style.position = 'fixed';
-            heart.style.left = `${centerX}px`;
-            heart.style.top = `${centerY}px`;
-            heart.style.fontSize = `${Math.random() * 40 + 20}px`;
-            heart.style.animation = 'heart-burst 1.5s forwards';
-            document.body.appendChild(heart);
-            
-            setTimeout(() => heart.remove(), 1500);
-        }
-    }
-    
-    function createRomanticBackdrop() {
-        const backdrop = document.createElement('div');
-        backdrop.style.position = 'fixed';
-        backdrop.style.top = '0';
-        backdrop.style.left = '0';
-        backdrop.style.width = '100%';
-        backdrop.style.height = '100%';
-        backdrop.style.background = 'linear-gradient(135deg, rgba(255,105,180,0.3), rgba(135,206,235,0.3))';
-        backdrop.style.zIndex = '1';
-        backdrop.style.pointerEvents = 'none';
-        document.body.appendChild(backdrop);
+        setTimeout(() => finalMoment.remove(), 3000);
         
-        setTimeout(() => backdrop.remove(), 3000);
+        // Create final heart moment
+        setTimeout(createFinalHeart, 2000);
     }
     
-    function createFinalHeartMoment() {
+    function createFinalHeart() {
         const heart = document.createElement('div');
         heart.innerHTML = '❤️';
         heart.style.position = 'fixed';
-        heart.style.left = `${WINDOW_WIDTH / 2}px`;
-        heart.style.top = `${WINDOW_HEIGHT / 2}px`;
+        heart.style.top = '50%';
+        heart.style.left = '50%';
+        heart.style.transform = 'translate(-50%, -50%) scale(0)';
         heart.style.fontSize = '0px';
         heart.style.transition = 'all 2s ease';
-        heart.style.transform = 'translate(-50%, -50%)';
         document.body.appendChild(heart);
         
         setTimeout(() => {
             heart.style.fontSize = '200px';
-            heart.style.opacity = '0.7';
+            heart.style.transform = 'translate(-50%, -50%) scale(1)';
         }, 100);
         
-        setTimeout(() => heart.remove(), 2000);
+        setTimeout(() => heart.remove(), 3000);
     }
     
-    // Music and animation control
+    // Music and Animation Control
     function initAnimation() {
+        // Add animation styles
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes playful-bounce {
+                0% { transform: translateY(0) rotate(-5deg); }
+                50% { transform: translateY(-10px) rotate(5deg); }
+                100% { transform: translateY(0) rotate(0deg); }
+            }
+        `;
+        document.head.appendChild(style);
+        
         // Start music if not playing
         if (backgroundMusic.paused) {
             backgroundMusic.play();
             musicToggle.textContent = '🎵 Music On';
         }
         
-        // Create romantic animation scenario
-        createRomanticScenario();
-        
-        // Add global styles for animations
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes gentle-sway {
-                from { transform: rotate(5deg) translateY(-5px); }
-                to { transform: rotate(-5deg) translateY(5px); }
-            }
-            
-            @keyframes heart-trail {
-                from { opacity: 0.7; transform: translateY(0); }
-                to { opacity: 0; transform: translateY(-100px); }
-            }
-            
-            @keyframes float-heart {
-                from { transform: translateY(0) rotate(0deg); opacity: 1; }
-                to { transform: translateY(-300px) rotate(360deg); opacity: 0; }
-            }
-            
-            @keyframes heart-burst {
-                from { transform: scale(0) rotate(0deg); opacity: 1; }
-                to { transform: scale(2) rotate(360deg); opacity: 0; }
-            }
-        `;
-        document.head.appendChild(style);
+        // Create unique story animation
+        createUniqueStory();
     }
     
     // Initialize everything
