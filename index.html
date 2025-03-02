@@ -18,15 +18,49 @@
             overflow: hidden;
         }
         
-    .container {
-    position: relative;  /* Makes it a positioning context */
+   .container {
+    position: relative;
     text-align: center;
     z-index: 10;
-    height: 300px; /* Gives more vertical space */
+    height: 300px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
+}
+	    /* Add these new character game styles */
+.characters-container {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 220px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    z-index: 10;
+}
+
+.character {
+    position: absolute;
+    bottom: 0;
+    transform-origin: bottom center;
+}
+
+.character img {
+    height: 150px;
+    width: auto;
+    filter: drop-shadow(0 5px 5px rgba(0,0,0,0.3));
+    transform-origin: bottom center;
+}
+
+.amine {
+    left: -150px;
+    z-index: 21;
+}
+
+.douae {
+    right: -150px;
+    z-index: 20;
 }
         
         h1 {
