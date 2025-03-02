@@ -17,15 +17,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Fix PNG alignment
     function fixImageAlignment() {
         if (amineImg && douaeImg) {
-            // Set consistent dimensions and alignment
+            // Set to initial size without stretching
             const imageStyle = {
-                width: '100%',
-                height: 'auto',
-                objectFit: 'contain',
+                width: 'auto',           // Keep original width
+                height: 'auto',          // Keep original height
+                maxWidth: '250px',       // Prevent from being too large
+                objectFit: 'initial',    // Don't force any specific sizing
                 display: 'block',
                 margin: '0 auto',
-                position: 'relative',
-                maxWidth: '100%'
+                position: 'relative'
             };
             
             // Apply styles to both images
@@ -33,19 +33,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 for (const prop in imageStyle) {
                     img.style[prop] = imageStyle[prop];
                 }
+                
+                // Reset any previous sizing
+                img.style.transform = 'none';
+                img.style.scale = '1';
             });
             
             // Make sure parent elements have consistent positioning
             if (amine && douae) {
                 const containerStyle = {
                     position: 'relative',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    width: '100%',
+                    display: 'inline-block', // Changed from flex to inline-block
+                    textAlign: 'center',
+                    width: 'auto',
                     height: 'auto',
-                    padding: '0',
-                    margin: '0',
+                    padding: '10px',
+                    margin: '0 10px',
                     overflow: 'visible'
                 };
                 
@@ -58,9 +61,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const container = document.querySelector('.container');
                 if (container) {
                     container.style.display = 'flex';
-                    container.style.justifyContent = 'space-around';
+                    container.style.justifyContent = 'center';
                     container.style.alignItems = 'center';
-                    container.style.width = '100%';
+                    container.style.flexWrap = 'nowrap';
                 }
             }
         }
