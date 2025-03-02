@@ -1,88 +1,34 @@
-// animations-music.js - Music and lyrics synchronization
+// animations-music.js - Character dancing animations synced with music
 
 document.addEventListener('DOMContentLoaded', function() {
     // Elements
+    const amine = document.getElementById('amine');
+    const douae = document.getElementById('douae');
+    const amineImg = amine?.querySelector('img');
+    const douaeImg = douae?.querySelector('img');
     const backgroundMusic = document.getElementById('backgroundMusic');
     const musicToggle = document.getElementById('musicToggle');
-    const lyricsToggle = document.getElementById('lyricsToggle');
-    const lyricsContainer = document.getElementById('lyricsContainer');
-    const lyricsWrapper = document.getElementById('lyricsWrapper');
-    const currentLyric = document.getElementById('currentLyric');
     
-    // Audio visualization elements
+    // Beat detection variables
     let audioContext;
     let analyser;
     let dataArray;
-    
-    // Create visualization canvas
-    const visualizer = document.createElement('canvas');
-    visualizer.width = window.innerWidth;
-    visualizer.height = 70;
-    visualizer.style.position = 'fixed';
-    visualizer.style.bottom = '0';
-    visualizer.style.left = '0';
-    visualizer.style.width = '100%';
-    visualizer.style.height = '70px';
-    visualizer.style.zIndex = '5';
-    visualizer.style.opacity = '0.5';
-    visualizer.style.pointerEvents = 'none';
-    document.body.appendChild(visualizer);
-    
-    const canvasCtx = visualizer.getContext('2d');
-    
-    // Set up empty array for beat detection
     let beatHistory = [];
     let lastBeatTime = 0;
+    let currentBeatCount = 0;
+    let danceState = 0;
     
-    // Lyrics data with timestamps in ms
-    const lyrics = [
-        { time: 0, text: "يا دعاء" },
-        { time: 5000, text: "أنت الحب الذي يملأ قلبي" },
-        { time: 10000, text: "كل لحظة معك هي نعمة" },
-        { time: 15000, text: "أنت نوري في الظلام" },
-        { time: 20000, text: "وأملي في الحياة" },
-        { time: 25000, text: "عيناك كالنجوم في سماء الليل" },
-        { time: 30000, text: "وابتسامتك كشروق الشمس" },
-        { time: 35000, text: "أحبك بكل ما في الكلمة من معنى" },
-        { time: 40000, text: "أنت الجمال الذي يسحر قلبي" },
-        { time: 45000, text: "وروحك النقية التي تلهمني" },
-        { time: 50000, text: "معك، الحياة أجمل" },
-        { time: 55000, text: "وقلبي ينبض بحبك" },
-        { time: 60000, text: "يا دعاء، أنت حبيبتي" },
-        { time: 65000, text: "وأنت سعادتي" },
-        { time: 70000, text: "كل يوم معك هو هدية" },
-        { time: 75000, text: "وكل لحظة هي كنز" },
-        { time: 80000, text: "أحبك يا دعاء" },
-        { time: 85000, text: "وقلبي ملكك إلى الأبد" },
-        { time: 90000, text: "أنت القمر الذي ينير ليلي" },
-        { time: 95000, text: "والشمس التي تدفئ أيامي" },
-        { time: 100000, text: "حبي لك يتجاوز حدود الزمان والمكان" },
-        { time: 105000, text: "يا دعاء، أنت كل ما أتمناه" },
-        { time: 110000, text: "وكل ما أحلم به" },
-        { time: 115000, text: "معك، الحياة مليئة بالألوان" },
-        { time: 120000, text: "وبدونك، العالم يفقد بريقه" },
-        { time: 125000, text: "أحبك بعمق المحيط" },
-        { time: 130000, text: "وارتفاع السماء" },
-        { time: 135000, text: "يا دعاء، أنت نصفي الآخر" },
-        { time: 140000, text: "وروحي التوأم" },
-        { time: 145000, text: "كلماتي لا تستطيع وصف مشاعري" },
-        { time: 150000, text: "لكن قلبي يخبرك كل يوم" },
-        { time: 155000, text: "أنك الحب الأول والأخير" },
-        { time: 160000, text: "يا دعاء، أحبك" },
-        { time: 165000, text: "وسأظل أحبك" },
-        { time: 170000, text: "إلى آخر نفس في حياتي" },
-        { time: 175000, text: "أنت النور الذي يضيء دربي" },
-        { time: 180000, text: "والأمل الذي يملأ روحي" },
-        { time: 185000, text: "يا دعاء" },
-        { time: 190000, text: "أحبك من كل قلبي" },
-        { time: 195000, text: "وبكل روحي" },
-        { time: 200000, text: "أنت حبيبتي إلى الأبد" },
-        { time: 205000, text: "❤️ يا دعاء ❤️" }
-    ];
+    // Dance animation states
+    const danceStates = {
+        SIDE_TO_SIDE: 0,
+        JUMP: 1,
+        SPIN: 2,
+        LEAN: 3,
+        WAVE: 4
+    };
     
-    // Initialize audio context and analyzer
+    // Initialize audio context and beat detection
     function initAudio() {
-        // Create audio context and connect to music source
         try {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
             const source = audioContext.createMediaElementSource(backgroundMusic);
@@ -97,19 +43,17 @@ document.addEventListener('DOMContentLoaded', function() {
             const bufferLength = analyser.frequencyBinCount;
             dataArray = new Uint8Array(bufferLength);
             
-            // Start visualization
-            visualize();
+            // Start detecting beats
+            detectBeats();
         } catch (e) {
             console.error('Web Audio API error:', e);
         }
     }
     
-    // Audio visualization function
-    function visualize() {
-        canvasCtx.clearRect(0, 0, visualizer.width, visualizer.height);
-        
+    // Beat detection function
+    function detectBeats() {
         if (!backgroundMusic.paused) {
-            requestAnimationFrame(visualize);
+            requestAnimationFrame(detectBeats);
             
             // Get frequency data
             analyser.getByteFrequencyData(dataArray);
@@ -132,14 +76,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 lastBeatTime = now;
                 onBeat();
             }
-            
-            // Draw visualization
-            drawVisualization(dataArray);
         } else {
-            // Draw flat line when paused
-            canvasCtx.fillStyle = 'rgba(135, 206, 235, 0.2)';
-            canvasCtx.fillRect(0, visualizer.height / 2 - 1, visualizer.width, 2);
-            requestAnimationFrame(visualize);
+            requestAnimationFrame(detectBeats);
         }
     }
     
@@ -152,396 +90,346 @@ document.addEventListener('DOMContentLoaded', function() {
         return sum / (endBin - startBin + 1);
     }
     
-    // Draw audio visualization
-    function drawVisualization(dataArray) {
-        const gradient = canvasCtx.createLinearGradient(0, 0, 0, visualizer.height);
-        gradient.addColorStop(0, 'rgba(255, 160, 200, 0.8)');
-        gradient.addColorStop(0.5, 'rgba(135, 206, 235, 0.5)');
-        gradient.addColorStop(1, 'rgba(135, 206, 235, 0.2)');
-        
-        canvasCtx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-        canvasCtx.fillRect(0, 0, visualizer.width, visualizer.height);
-        
-        const barWidth = (visualizer.width / dataArray.length) * 2.5;
-        let barHeight;
-        let x = 0;
-        
-        for (let i = 0; i < dataArray.length; i++) {
-            barHeight = dataArray[i] / 2;
-            
-            canvasCtx.fillStyle = gradient;
-            canvasCtx.fillRect(x, visualizer.height - barHeight, barWidth, barHeight);
-            
-            // Mirror effect at the top for more aesthetic look
-            canvasCtx.fillRect(x, 0, barWidth, barHeight * 0.3);
-            
-            x += barWidth + 1;
-        }
-    }
-    
     // Actions to take on detected beats
     function onBeat() {
-        // Pulse the heart
-        const heart = document.querySelector('.heart');
-        if (heart) {
-            heart.classList.add('pink');
-            setTimeout(() => heart.classList.remove('pink'), 200);
+        // Only animate if characters exist
+        if (!amine || !douae) return;
+        
+        // Count beats to change dance moves
+        currentBeatCount++;
+        
+        // Change dance move every 8 beats
+        if (currentBeatCount % 8 === 0) {
+            danceState = (danceState + 1) % 5; // Cycle through dance states
         }
         
-        // Create random hearts
-        for (let i = 0; i < 2; i++) {
-            setTimeout(() => {
-                const x = Math.random() * window.innerWidth;
-                const y = Math.random() * window.innerHeight * 0.7;
-                createHeartTrail(x, y);
-            }, i * 100);
+        // Perform dance move based on current state
+        switch (danceState) {
+            case danceStates.SIDE_TO_SIDE:
+                danceSideToSide();
+                break;
+            case danceStates.JUMP:
+                danceJump();
+                break;
+            case danceStates.SPIN:
+                danceSpin();
+                break;
+            case danceStates.LEAN:
+                danceLean();
+                break;
+            case danceStates.WAVE:
+                danceWave();
+                break;
         }
         
-        // Pulse title
-        const title = document.querySelector('h1');
-        if (title) {
-            title.style.transform = 'scale(1.03)';
-            setTimeout(() => {
-                title.style.transform = 'scale(1)';
-            }, 200);
+        // Create heart effect occasionally
+        if (Math.random() > 0.7) {
+            createHeartEffect();
         }
     }
     
-    // Create heart trail for beat visualization
-    function createHeartTrail(x, y) {
-        const heartTrail = document.createElement('div');
-        heartTrail.className = 'heart-trail';
-        heartTrail.innerHTML = '❤️';
-        heartTrail.style.left = `${x}px`;
-        heartTrail.style.top = `${y}px`;
-        heartTrail.style.fontSize = `${Math.random() * 20 + 15}px`;
-        document.body.appendChild(heartTrail);
+    // Side to side dance move
+    function danceSideToSide() {
+        if (!amineImg || !douaeImg) return;
         
-        // Remove after animation complete
+        // Amine moves left
+        amineImg.style.transition = 'transform 0.3s ease-out';
+        amineImg.style.transform = 'translateX(-10px)';
+        
+        // Douae moves right
+        douaeImg.style.transition = 'transform 0.3s ease-out';
+        douaeImg.style.transform = 'translateX(10px)';
+        
+        // Return to center on next beat
         setTimeout(() => {
-            heartTrail.remove();
+            amineImg.style.transform = 'translateX(10px)';
+            douaeImg.style.transform = 'translateX(-10px)';
+            
+            // Reset after the move
+            setTimeout(() => {
+                amineImg.style.transform = '';
+                douaeImg.style.transform = '';
+            }, 300);
+        }, 300);
+    }
+    
+    // Jump dance move
+    function danceJump() {
+        if (!amineImg || !douaeImg) return;
+        
+        // Both characters jump
+        amineImg.style.transition = 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+        amineImg.style.transform = 'translateY(-20px)';
+        
+        douaeImg.style.transition = 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+        douaeImg.style.transform = 'translateY(-20px)';
+        
+        // Return to ground
+        setTimeout(() => {
+            amineImg.style.transition = 'transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045)';
+            amineImg.style.transform = '';
+            
+            douaeImg.style.transition = 'transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045)';
+            douaeImg.style.transform = '';
+        }, 200);
+    }
+    
+    // Spin dance move
+    function danceSpin() {
+        if (!amineImg || !douaeImg) return;
+        
+        // Amine spins clockwise
+        amineImg.style.transition = 'transform 0.5s ease-in-out';
+        amineImg.style.transform = 'rotate(360deg)';
+        
+        // Douae spins counter-clockwise
+        douaeImg.style.transition = 'transform 0.5s ease-in-out';
+        douaeImg.style.transform = 'rotate(-360deg)';
+        
+        // Reset after spin
+        setTimeout(() => {
+            amineImg.style.transition = 'none';
+            amineImg.style.transform = '';
+            
+            douaeImg.style.transition = 'none';
+            douaeImg.style.transform = '';
+        }, 500);
+    }
+    
+    // Lean dance move
+    function danceLean() {
+        if (!amineImg || !douaeImg) return;
+        
+        // Amine leans right
+        amineImg.style.transition = 'transform 0.3s ease-out';
+        amineImg.style.transform = 'rotate(15deg)';
+        
+        // Douae leans left
+        douaeImg.style.transition = 'transform 0.3s ease-out';
+        douaeImg.style.transform = 'rotate(-15deg)';
+        
+        // Return to upright on next beat
+        setTimeout(() => {
+            amineImg.style.transform = 'rotate(-10deg)';
+            douaeImg.style.transform = 'rotate(10deg)';
+            
+            // Reset after the move
+            setTimeout(() => {
+                amineImg.style.transform = '';
+                douaeImg.style.transform = '';
+            }, 300);
+        }, 300);
+    }
+    
+    // Wave dance move
+    function danceWave() {
+        if (!amineImg || !douaeImg) return;
+        
+        // Wave effect for Amine
+        amineImg.style.transition = 'transform 0.5s ease-in-out';
+        amineImg.style.transformOrigin = 'bottom center';
+        amineImg.style.transform = 'skewX(10deg)';
+        
+        // Wave effect for Douae
+        douaeImg.style.transition = 'transform 0.5s ease-in-out';
+        douaeImg.style.transformOrigin = 'bottom center';
+        douaeImg.style.transform = 'skewX(-10deg)';
+        
+        // Return to normal
+        setTimeout(() => {
+            amineImg.style.transform = 'skewX(-5deg)';
+            douaeImg.style.transform = 'skewX(5deg)';
+            
+            setTimeout(() => {
+                amineImg.style.transform = '';
+                douaeImg.style.transform = '';
+            }, 250);
+        }, 250);
+    }
+    
+    // Create heart effect between characters
+    function createHeartEffect() {
+        if (!amine || !douae) return;
+        
+        // Calculate position between characters
+        const amineRect = amine.getBoundingClientRect();
+        const douaeRect = douae.getBoundingClientRect();
+        
+        const centerX = (amineRect.left + douaeRect.left) / 2 + 50;
+        const centerY = (amineRect.top + douaeRect.top) / 2 - 30;
+        
+        // Create heart
+        const heart = document.createElement('div');
+        heart.innerHTML = '❤️';
+        heart.style.position = 'fixed';
+        heart.style.left = `${centerX}px`;
+        heart.style.top = `${centerY}px`;
+        heart.style.fontSize = '0px';
+        heart.style.opacity = '0';
+        heart.style.transform = 'translate(-50%, -50%)';
+        heart.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+        heart.style.zIndex = '100';
+        
+        document.body.appendChild(heart);
+        
+        // Animate heart
+        setTimeout(() => {
+            heart.style.fontSize = '30px';
+            heart.style.opacity = '1';
+            
+            setTimeout(() => {
+                heart.style.top = `${centerY - 50}px`;
+                heart.style.opacity = '0';
+                
+                setTimeout(() => {
+                    heart.remove();
+                }, 500);
+            }, 500);
+        }, 10);
+    }
+    
+    // Special dance sequence for chorus or high-energy parts
+    function danceChorus() {
+        // Only animate if characters exist
+        if (!amine || !douae || !amineImg || !douaeImg) return;
+        
+        // Save current positions
+        const currentAmineLeft = amine.style.left || '0px';
+        const currentDouaeRight = douae.style.right || '0px';
+        
+        // Make characters move closer
+        amine.style.transition = 'left 2s ease-in-out';
+        amine.style.left = 'calc(50% - 100px)';
+        
+        douae.style.transition = 'right 2s ease-in-out';
+        douae.style.right = 'calc(50% - 100px)';
+        
+        // Heart effect between them
+        createIntenseHeartEffects();
+        
+        // Series of dance moves
+        setTimeout(() => {
+            // Jump together
+            danceJump();
+            
+            setTimeout(() => {
+                // Spin
+                danceSpin();
+                
+                setTimeout(() => {
+                    // Lean toward each other
+                    amineImg.style.transition = 'transform 1s ease-out';
+                    amineImg.style.transform = 'rotate(20deg)';
+                    
+                    douaeImg.style.transition = 'transform 1s ease-out';
+                    douaeImg.style.transform = 'rotate(-20deg)';
+                    
+                    // Reset after chorus
+                    setTimeout(() => {
+                        // Return to original positions
+                        amine.style.left = currentAmineLeft;
+                        douae.style.right = currentDouaeRight;
+                        
+                        // Reset transformations
+                        amineImg.style.transition = 'transform 1s ease-out';
+                        amineImg.style.transform = '';
+                        
+                        douaeImg.style.transition = 'transform 1s ease-out';
+                        douaeImg.style.transform = '';
+                    }, 4000);
+                }, 1000);
+            }, 1000);
         }, 2000);
     }
     
-    // Update lyrics based on current playback time
-    function updateLyrics() {
-        if (backgroundMusic.paused) return;
+    // Create multiple heart effects for chorus
+    function createIntenseHeartEffects() {
+        const interval = setInterval(() => {
+            createHeartEffect();
+        }, 500);
         
-        const currentTime = backgroundMusic.currentTime * 1000;
-        
-        // Find the current lyric based on time
-        let currentIndex = 0;
-        for (let i = lyrics.length - 1; i >= 0; i--) {
-            if (currentTime >= lyrics[i].time) {
-                currentIndex = i;
-                break;
-            }
-        }
-        
-        // Find the next lyric
-        const nextIndex = currentIndex < lyrics.length - 1 ? currentIndex + 1 : currentIndex;
-        
-        // Calculate progress through current lyric (for smooth transitions)
-        let progress = 0;
-        if (nextIndex > currentIndex) {
-            const lyricDuration = lyrics[nextIndex].time - lyrics[currentIndex].time;
-            progress = (currentTime - lyrics[currentIndex].time) / lyricDuration;
-        }
-        
-        // Update current lyric text with animation
-        if (currentLyric.textContent !== lyrics[currentIndex].text) {
-            // Fade out current text
-            currentLyric.style.opacity = '0';
-            currentLyric.style.transform = 'translateY(10px)';
-            
-            // After fade out, update text and fade in
-            setTimeout(() => {
-                currentLyric.textContent = lyrics[currentIndex].text;
-                currentLyric.style.opacity = '1';
-                currentLyric.style.transform = 'translateY(0)';
-                
-                // Pulse heart on lyric change
-                const heart = document.querySelector('.heart');
-                if (heart) {
-                    heart.classList.add('pink');
-                    setTimeout(() => heart.classList.remove('pink'), 500);
-                }
-            }, 300);
-        }
-        
-        // Populate lyrics wrapper with all lyrics (first time only)
-        if (lyricsWrapper.children.length <= 1) {
-            populateLyricsWrapper();
-        } else {
-            // Update active lyric in the wrapper
-            const lyricElements = lyricsWrapper.querySelectorAll('.lyrics-line');
-            
-            lyricElements.forEach((el, i) => {
-                el.classList.remove('active', 'pre-active');
-                
-                if (i === currentIndex) {
-                    el.classList.add('active');
-                } else if (i === currentIndex + 1) {
-                    el.classList.add('pre-active');
-                }
-            });
-            
-            // Auto-scroll to keep active lyric visible
-            const activeElement = lyricsWrapper.querySelector('.lyrics-line.active');
-            if (activeElement) {
-                const containerRect = lyricsWrapper.getBoundingClientRect();
-                const activeRect = activeElement.getBoundingClientRect();
-                
-                // Calculate if active element is visible
-                if (activeRect.bottom > containerRect.bottom || activeRect.top < containerRect.top) {
-                    activeElement.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center'
-                    });
-                }
-            }
-        }
+        // Stop after a few seconds
+        setTimeout(() => {
+            clearInterval(interval);
+        }, 5000);
     }
     
-    // Populate lyrics wrapper with all lyrics for scrolling view
-    function populateLyricsWrapper() {
-        lyricsWrapper.innerHTML = '';
+    // Create dance timeline based on song sections
+    function createDanceTimeline() {
+        if (!backgroundMusic) return;
         
-        lyrics.forEach((lyric, index) => {
-            const line = document.createElement('div');
-            line.className = 'lyrics-line';
-            line.textContent = lyric.text;
-            
-            // Check if this is the current lyric
-            const currentTime = backgroundMusic.currentTime * 1000;
-            if (currentTime >= lyric.time && 
-                (index === lyrics.length - 1 || currentTime < lyrics[index + 1].time)) {
-                line.classList.add('active');
-            }
-            
-            lyricsWrapper.appendChild(line);
-        });
-    }
-    
-    // Create visual time markers for key moments in the song
-    function createTimeMarkers() {
-        const markers = [
-            { time: 30000, event: 'Amine appears' },
-            { time: 60000, event: 'Gives flower' },
-            { time: 90000, event: 'Dancing together' },
-            { time: 120000, event: 'Special moment' },
-            { time: 150000, event: 'Final scene' }
+        // Timeline of dance sequences (timestamps in seconds)
+        const timeline = [
+            { time: 5, action: danceChorus },
+            { time: 30, action: danceChorus },
+            { time: 60, action: danceChorus },
+            { time: 90, action: danceChorus },
+            { time: 120, action: danceChorus },
+            { time: 150, action: danceChorus },
+            { time: 180, action: danceChorus }
         ];
         
-        const timelineContainer = document.createElement('div');
-        timelineContainer.className = 'timeline-container';
-        timelineContainer.style.position = 'fixed';
-        timelineContainer.style.top = '50px';
-        timelineContainer.style.right = '20px';
-        timelineContainer.style.width = '10px';
-        timelineContainer.style.height = '200px';
-        timelineContainer.style.background = 'rgba(0, 0, 0, 0.3)';
-        timelineContainer.style.borderRadius = '5px';
-        timelineContainer.style.zIndex = '100';
-        
-        document.body.appendChild(timelineContainer);
-        
-        // Create progress indicator
-        const progressIndicator = document.createElement('div');
-        progressIndicator.className = 'progress-indicator';
-        progressIndicator.style.position = 'absolute';
-        progressIndicator.style.left = '0';
-        progressIndicator.style.width = '100%';
-        progressIndicator.style.height = '0%';
-        progressIndicator.style.background = 'rgba(135, 206, 235, 0.8)';
-        progressIndicator.style.borderRadius = '5px';
-        progressIndicator.style.bottom = '0';
-        progressIndicator.style.transition = 'height 0.3s linear';
-        
-        timelineContainer.appendChild(progressIndicator);
-        
-        // Add markers
-        markers.forEach(marker => {
-            const percent = (marker.time / (211000)) * 100; // Song duration
+        // Check timeline during song playback
+        backgroundMusic.addEventListener('timeupdate', function() {
+            const currentTime = backgroundMusic.currentTime;
             
-            const markerElement = document.createElement('div');
-            markerElement.className = 'timeline-marker';
-            markerElement.style.position = 'absolute';
-            markerElement.style.width = '20px';
-            markerElement.style.height = '4px';
-            markerElement.style.background = '#fff';
-            markerElement.style.left = '-5px';
-            markerElement.style.bottom = `${percent}%`;
-            markerElement.style.borderRadius = '2px';
-            markerElement.title = marker.event;
-            
-            // Label for marker
-            const label = document.createElement('div');
-            label.className = 'marker-label';
-            label.textContent = marker.event;
-            label.style.position = 'absolute';
-            label.style.right = '15px';
-            label.style.transform = 'translateY(-50%)';
-            label.style.color = '#fff';
-            label.style.fontSize = '10px';
-            label.style.opacity = '0';
-            label.style.transition = 'opacity 0.3s ease';
-            label.style.whiteSpace = 'nowrap';
-            
-            markerElement.appendChild(label);
-            timelineContainer.appendChild(markerElement);
-            
-            // Show label on hover
-            markerElement.addEventListener('mouseenter', () => {
-                label.style.opacity = '1';
-            });
-            
-            markerElement.addEventListener('mouseleave', () => {
-                label.style.opacity = '0';
+            // Check if we should trigger any timeline events
+            timeline.forEach(event => {
+                // Use a small range to catch the timestamp
+                if (currentTime >= event.time && currentTime <= event.time + 0.5) {
+                    event.action();
+                }
             });
         });
-        
-        // Update progress indicator
-        function updateProgress() {
-            if (!backgroundMusic.paused) {
-                const progress = (backgroundMusic.currentTime / 211) * 100; // Song duration in seconds
-                progressIndicator.style.height = `${progress}%`;
-            }
-            requestAnimationFrame(updateProgress);
-        }
-        
-        updateProgress();
     }
     
     // Music toggle control
-    musicToggle.addEventListener('click', function() {
-        if (backgroundMusic.paused) {
-            backgroundMusic.play()
-                .then(() => {
-                    // Only initialize audio context after user interaction
-                    if (!audioContext) {
-                        initAudio();
-                    } else if (audioContext.state === 'suspended') {
-                        audioContext.resume();
-                    }
-                    musicToggle.textContent = '🎵 Music On';
-                })
-                .catch(err => {
-                    console.error('Error playing audio:', err);
-                });
-        } else {
-            backgroundMusic.pause();
-            musicToggle.textContent = '🎵 Music Off';
-        }
-    });
-    
-    // Lyrics toggle control
-    lyricsToggle.addEventListener('click', function() {
-        if (lyricsContainer.style.display === 'none' || lyricsContainer.style.display === '') {
-            lyricsContainer.style.display = 'block';
-            lyricsToggle.textContent = '🎵 Hide Lyrics';
-            
-            // Populate lyrics if not already done
-            if (lyricsWrapper.children.length <= 1) {
-                populateLyricsWrapper();
+    if (musicToggle) {
+        musicToggle.addEventListener('click', function() {
+            if (backgroundMusic.paused) {
+                backgroundMusic.play()
+                    .then(() => {
+                        // Only initialize audio context after user interaction
+                        if (!audioContext) {
+                            initAudio();
+                        } else if (audioContext.state === 'suspended') {
+                            audioContext.resume();
+                        }
+                        musicToggle.textContent = '🎵 Music On';
+                    })
+                    .catch(err => {
+                        console.error('Error playing audio:', err);
+                    });
+            } else {
+                backgroundMusic.pause();
+                musicToggle.textContent = '🎵 Music Off';
             }
-        } else {
-            lyricsContainer.style.display = 'none';
-            lyricsToggle.textContent = '🎵 Show Lyrics';
-        }
-    });
-    
-    // Create animated waveform around the heart on beats
-    function createHeartWaveform() {
-        const heart = document.querySelector('.heart');
-        if (!heart) return;
-        
-        const waveContainer = document.createElement('div');
-        waveContainer.style.position = 'absolute';
-        waveContainer.style.width = '100%';
-        waveContainer.style.height = '100%';
-        waveContainer.style.top = '0';
-        waveContainer.style.left = '0';
-        waveContainer.style.pointerEvents = 'none';
-        waveContainer.style.zIndex = '-1';
-        
-        heart.appendChild(waveContainer);
-        
-        function createWave() {
-            const wave = document.createElement('div');
-            wave.style.position = 'absolute';
-            wave.style.width = '100%';
-            wave.style.height = '100%';
-            wave.style.borderRadius = '50%';
-            wave.style.border = '2px solid rgba(135, 206, 235, 0.8)';
-            wave.style.opacity = '0.8';
-            wave.style.transform = 'scale(1)';
-            wave.style.top = '0';
-            wave.style.left = '0';
-            
-            waveContainer.appendChild(wave);
-            
-            // Animate wave
-            let scale = 1;
-            let opacity = 0.8;
-            
-            function animate() {
-                scale += 0.03;
-                opacity -= 0.015;
-                
-                wave.style.transform = `scale(${scale})`;
-                wave.style.opacity = opacity;
-                
-                if (opacity > 0) {
-                    requestAnimationFrame(animate);
-                } else {
-                    wave.remove();
-                }
-            }
-            
-            requestAnimationFrame(animate);
-        }
-        
-        // Create waves on beat
-        document.addEventListener('musicBeat', () => {
-            createWave();
         });
-        
-        // Also create occasional waves
-        setInterval(() => {
-            if (!backgroundMusic.paused && Math.random() > 0.7) {
-                createWave();
-            }
-        }, 1000);
     }
     
-    // Initialize music-related features
+    // Initialize dancing animations
     function init() {
-        // Update lyrics every 100ms for smoother tracking
-        setInterval(updateLyrics, 100);
-        
         // Check if song ended and loop
-        backgroundMusic.addEventListener('ended', function() {
-            backgroundMusic.currentTime = 0;
-            backgroundMusic.play();
-        });
+        if (backgroundMusic) {
+            backgroundMusic.addEventListener('ended', function() {
+                backgroundMusic.currentTime = 0;
+                backgroundMusic.play();
+            });
+            
+            // Auto-play music after a short delay (many browsers require user interaction)
+            setTimeout(() => {
+                backgroundMusic.play()
+                    .then(() => {
+                        initAudio();
+                    })
+                    .catch(err => {
+                        console.log('Auto-play prevented. Click music toggle to play.', err);
+                    });
+            }, 1000);
+        }
         
-        // Create timeline markers
-        createTimeMarkers();
-        
-        // Create heart waveform
-        createHeartWaveform();
-        
-        // Auto-play music after a short delay (many browsers require user interaction)
-        setTimeout(() => {
-            backgroundMusic.play()
-                .then(() => {
-                    initAudio();
-                })
-                .catch(err => {
-                    console.log('Auto-play prevented. Click music toggle to play.', err);
-                });
-        }, 1000);
+        // Set up dance timeline
+        createDanceTimeline();
     }
     
     // Start everything
