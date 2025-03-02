@@ -13,8 +13,10 @@ function performFinaleAnimation() {
     amine.style.transition = 'left 1s ease-in-out';
     douae.style.transition = 'right 1s ease-in-out';
     
-    amine.style.left = 'calc(50% - 100px)';
-    douae.style.right = 'calc(50% - 100px)';
+    // Apply scale factors here
+    const centerOffset = 100 * scaleFactor;
+    amine.style.left = `calc(50% - ${centerOffset}px)`;
+    douae.style.right = `calc(50% - ${centerOffset}px)`;
     
     // Create fireworks effect
     createFireworks();
