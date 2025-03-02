@@ -1,117 +1,67 @@
-// animations.js - Additional animations for the romantic webpage
+// animations.js - Basic animation functions for the romantic webpage
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Elements
-    const amineChar = document.getElementById('amine');
-    const douaeChar = document.getElementById('douae');
-    const container = document.querySelector('.container');
-    const h1 = document.querySelector('h1');
-    const message = document.querySelector('.message');
+// Create butterflies that fly around the screen
+function createButterflies() {
+    const BUTTERFLY_COUNT = 6;
     
-    // Animation settings
-    const animationSettings = {
-        butterflyCount: 8,
-        heartbeatSpeed: 2000,
-        specialEffectsEnabled: true,
-        currentScene: 'intro',
-        scenes: ['intro', 'meetup', 'romance', 'finale'],
-        animationsQueue: []
-    };
+    for (let i = 0; i < BUTTERFLY_COUNT; i++) {
+        createButterfly();
+    }
     
-    // Create butterflies that follow a path
-    function createButterflies() {
-        const butterflyContainer = document.createElement('div');
-        butterflyContainer.classList.add('butterflies-container');
-        document.body.appendChild(butterflyContainer);
+    // Create a butterfly with random color and path
+    function createButterfly() {
+        const butterfly = document.createElement('div');
+        butterfly.className = 'butterfly';
         
-        for (let i = 0; i < animationSettings.butterflyCount; i++) {
-            const butterfly = document.createElement('div');
-            butterfly.classList.add('butterfly');
-            
-            // Create wings
-            const leftWing = document.createElement('div');
-            leftWing.classList.add('butterfly-wing', 'left');
-            
-            const rightWing = document.createElement('div');
-            rightWing.classList.add('butterfly-wing', 'right');
-            
-            // Random colors for butterflies
-            const hue = Math.floor(Math.random() * 60) + 180; // Blue to purple range
-            const lightness = Math.floor(Math.random() * 20) + 70; // Light colors
-            
-            leftWing.style.background = `hsla(${hue}, 100%, ${lightness}%, 0.7)`;
-            rightWing.style.background = `hsla(${hue}, 100%, ${lightness}%, 0.9)`;
-            
-            // Add wings to butterfly
-            butterfly.appendChild(leftWing);
-            butterfly.appendChild(rightWing);
-            
-            // Position randomly
-            butterfly.style.left = Math.random() * 100 + 'vw';
-            butterfly.style.top = Math.random() * 100 + 'vh';
-            
-            // Add butterfly to container
-            butterflyContainer.appendChild(butterfly);
-            
-            // Animate butterfly
-            animateButterfly(butterfly);
-        }
+        // Create wings
+        const leftWing = document.createElement('div');
+        leftWing.className = 'butterfly-wing left';
+        
+        const rightWing = document.createElement('div');
+        rightWing.className = 'butterfly-wing right';
+        
+        // Apply random colors to wings
+        const hue = Math.floor(Math.random() * 60) + 180; // Blue to purple range
+        leftWing.style.background = `hsla(${hue}, 100%, 80%, 0.8)`;
+        rightWing.style.background = `hsla(${hue}, 100%, 80%, 0.8)`;
+        leftWing.style.boxShadow = `0 0 5px hsla(${hue}, 100%, 80%, 0.8)`;
+        rightWing.style.boxShadow = `0 0 5px hsla(${hue}, 100%, 80%, 0.8)`;
+        
+        // Append wings to butterfly
+        butterfly.appendChild(leftWing);
+        butterfly.appendChild(rightWing);
+        
+        // Position butterfly at random bottom location
+        butterfly.style.left = `${Math.random() * 90 + 5}%`;
+        butterfly.style.bottom = `${Math.random() * 20}%`;
+        
+        // Add to document
+        document.body.appendChild(butterfly);
+        
+        // Animate the butterfly
+        animateButterfly(butterfly);
     }
     
     // Animate a butterfly along a random path
     function animateButterfly(butterfly) {
-        // Path properties
-        const pathPoints = 5; // Number of points in the path
-        const path = [];
+        const duration = Math.random() * 15000 + 20000; // 20-35 seconds
+        const startTime = Date.now();
+        const startLeft = parseFloat(butterfly.style.left);
+        const startBottom = parseFloat(butterfly.style.bottom);
         
-        // Generate random bezier path
-        for (let i = 0; i < pathPoints; i++) {
-            path.push({
-                x: Math.random() * 100,
-                y: Math.random() * 100,
-                scale: 0.8 + Math.random() * 0.4,
-                duration: 5 + Math.random() * 5
-            });
-        }
+        // Generate random control points for a curved path
+        const control1X = startLeft + (Math.random() - 0.5) * 30;
+        const control1Y = startBottom + Math.random() * 40 + 20;
+        const control2X = startLeft + (Math.random() - 0.5) * 50;
+        const control2Y = startBottom + Math.random() * 60 + 40;
+        const endX = Math.random() * 90 + 5;
+        const endY = 100 + Math.random() * 20; // Above the top of the screen
         
-        // Starting position
-        let currentPoint = 0;
-        let lastTimestamp = 0;
-        let progress = 0;
-        
-        // Animation function
-        function moveButterfly(timestamp) {
-            if (!lastTimestamp) lastTimestamp = timestamp;
-            const elapsed = timestamp - lastTimestamp;
+        function step() {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
             
-            // Update progress
-            progress += elapsed / (path[currentPoint].duration * 1000);
-            
-            if (progress >= 1) {
-                // Move to next point
-                currentPoint = (currentPoint + 1) % pathPoints;
-                progress = 0;
-            }
-            
-            // Calculate next and previous points
-            const prevPoint = (currentPoint + pathPoints - 1) % pathPoints;
-            const nextPoint = (currentPoint + 1) % pathPoints;
-            
-            // Calculate bezier curve position
-            const startX = path[prevPoint].x;
-            const startY = path[prevPoint].y;
-            const endX = path[currentPoint].x;
-            const endY = path[currentPoint].y;
-            const nextX = path[nextPoint].x;
-            const nextY = path[nextPoint].y;
-            
-            // Bezier control points
-            const cp1x = startX + (endX - startX) * 0.5 + (Math.random() - 0.5) * 20;
-            const cp1y = startY + (endY - startY) * 0.5 + (Math.random() - 0.5) * 20;
-            const cp2x = endX + (nextX - endX) * 0.5 + (Math.random() - 0.5) * 20;
-            const cp2y = endY + (nextY - endY) * 0.5 + (Math.random() - 0.5) * 20;
-            
-            // Calculate current position using cubic bezier
+            // Cubic bezier formula to calculate position
             const t = progress;
             const u = 1 - t;
             const tt = t * t;
@@ -119,501 +69,369 @@ document.addEventListener('DOMContentLoaded', function() {
             const uuu = uu * u;
             const ttt = tt * t;
             
-            let x = uuu * startX;
-            x += 3 * uu * t * cp1x;
-            x += 3 * u * tt * cp2x;
-            x += ttt * endX;
+            const x = uuu * startLeft + 3 * uu * t * control1X + 3 * u * tt * control2X + ttt * endX;
+            const y = uuu * startBottom + 3 * uu * t * control1Y + 3 * u * tt * control2Y + ttt * endY;
             
-            let y = uuu * startY;
-            y += 3 * uu * t * cp1y;
-            y += 3 * u * tt * cp2y;
-            y += ttt * endY;
+            butterfly.style.left = `${x}%`;
+            butterfly.style.bottom = `${y}%`;
             
-            // Apply position and scaling
-            const scale = path[prevPoint].scale * (1 - progress) + path[currentPoint].scale * progress;
-            butterfly.style.transform = `translate(${x}vw, ${y}vh) scale(${scale})`;
+            // Add slight rotation for realism
+            const rotation = Math.sin(elapsed / 500) * 5;
+            butterfly.style.transform = `rotate(${rotation}deg)`;
             
-            // Add slight rotation based on direction
-            const angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI;
-            butterfly.style.rotate = (angle + 90) + 'deg';
-            
-            // Store timestamp
-            lastTimestamp = timestamp;
-            
-            // Continue animation
-            requestAnimationFrame(moveButterfly);
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            } else {
+                // Butterfly has completed its path, remove it and create a new one
+                butterfly.remove();
+                createButterfly();
+            }
         }
         
-        // Start animation
-        requestAnimationFrame(moveButterfly);
+        requestAnimationFrame(step);
     }
+}
+
+// Create hearts that float up from the heart container
+function createFloatingHearts() {
+    const container = document.querySelector('.container');
     
-    // Create heart beat animation for main heart
-    function setupHeartbeat() {
+    // Create a floating heart every few seconds
+    setInterval(() => {
         const heart = document.createElement('div');
-        heart.classList.add('heart');
+        heart.innerHTML = '❤️';
+        heart.style.position = 'absolute';
+        heart.style.fontSize = `${Math.random() * 15 + 10}px`;
+        heart.style.opacity = '0';
+        heart.style.left = `${Math.random() * 80 + 10}%`;
+        heart.style.bottom = '0';
         
-        // Create heart halves
-        const leftHalf = document.createElement('div');
-        leftHalf.classList.add('heart-half', 'left');
+        container.appendChild(heart);
         
-        const rightHalf = document.createElement('div');
-        rightHalf.classList.add('heart-half', 'right');
+        // Animate the heart
+        let bottom = 0;
+        let opacity = 0;
+        const maxBottom = 300;
+        const animationDuration = Math.random() * 3000 + 5000; // 5-8 seconds
+        const startTime = Date.now();
         
-        // Create front and back layers for 3D effect
-        const frontLayer = document.createElement('div');
-        frontLayer.classList.add('heart-front');
-        
-        const backLayer = document.createElement('div');
-        backLayer.classList.add('heart-back');
-        
-        // Create shine effect
-        const shine = document.createElement('div');
-        shine.classList.add('heart-shine');
-        
-        // Assemble heart
-        heart.appendChild(leftHalf);
-        heart.appendChild(rightHalf);
-        heart.appendChild(frontLayer);
-        heart.appendChild(backLayer);
-        heart.appendChild(shine);
-        
-        // Add heart to container
-        container.insertBefore(heart, message);
-        
-        // Make heart clickable to toggle color
-        heart.addEventListener('click', function() {
-            if (heart.classList.contains('pink')) {
-                heart.classList.remove('pink');
+        function animateHeart() {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / animationDuration, 1);
+            
+            bottom = progress * maxBottom;
+            
+            // Fade in and out
+            if (progress < 0.2) {
+                opacity = progress / 0.2; // Fade in during first 20%
+            } else if (progress > 0.8) {
+                opacity = (1 - progress) / 0.2; // Fade out during last 20%
             } else {
-                heart.classList.add('pink');
-                
-                // Create heart explosion
-                heartExplosion(heart);
+                opacity = 1;
             }
-        });
-        
-        // Automatic heartbeat
-        setInterval(() => {
-            const intensity = Math.random();
-            if (intensity > 0.7) {
-                // Strong heartbeat
-                heart.style.animation = 'heartbeat 0.6s';
-                setTimeout(() => {
-                    heart.style.animation = 'float 3s ease-in-out infinite';
-                }, 600);
+            
+            // Move in a slight curve
+            const horizontalOffset = Math.sin(progress * 6) * 20;
+            
+            heart.style.bottom = `${bottom}px`;
+            heart.style.marginLeft = `${horizontalOffset}px`;
+            heart.style.opacity = opacity.toString();
+            heart.style.transform = `rotate(${Math.sin(progress * 10) * 20}deg)`;
+            
+            if (progress < 1) {
+                requestAnimationFrame(animateHeart);
             } else {
-                // Normal float animation
-                heart.style.animation = 'float 3s ease-in-out infinite';
+                heart.remove();
             }
-        }, animationSettings.heartbeatSpeed);
-    }
-    
-    // Heart explosion effect for main heart
-    function heartExplosion(sourceHeart) {
-        const heartRect = sourceHeart.getBoundingClientRect();
-        const centerX = heartRect.left + heartRect.width / 2;
-        const centerY = heartRect.top + heartRect.height / 2;
-        
-        // Create mini hearts that fly out
-        for (let i = 0; i < 15; i++) {
-            const miniHeart = document.createElement('div');
-            miniHeart.innerHTML = '❤️';
-            miniHeart.style.position = 'fixed';
-            miniHeart.style.left = centerX + 'px';
-            miniHeart.style.top = centerY + 'px';
-            miniHeart.style.transform = 'translate(-50%, -50%)';
-            miniHeart.style.fontSize = (10 + Math.random() * 10) + 'px';
-            miniHeart.style.zIndex = '1000';
-            miniHeart.style.opacity = '1';
-            miniHeart.style.pointerEvents = 'none';
-            
-            document.body.appendChild(miniHeart);
-            
-            // Random direction and speed
-            const angle = Math.random() * Math.PI * 2;
-            const distance = 50 + Math.random() * 150;
-            const duration = 0.5 + Math.random() * 1;
-            
-            // Calculate end position
-            const endX = centerX + Math.cos(angle) * distance;
-            const endY = centerY + Math.sin(angle) * distance;
-            
-            // Animate the heart
-            miniHeart.animate([
-                { 
-                    transform: 'translate(-50%, -50%) scale(0.5)',
-                    opacity: 0.8
-                },
-                { 
-                    transform: `translate(calc(${endX - centerX}px - 50%), calc(${endY - centerY}px - 50%)) scale(1)`,
-                    opacity: 0
-                }
-            ], {
-                duration: duration * 1000,
-                easing: 'cubic-bezier(0.1, 0.7, 1.0, 0.1)'
-            });
-            
-            // Remove heart after animation
-            setTimeout(() => {
-                if (miniHeart.parentNode) {
-                    miniHeart.parentNode.removeChild(miniHeart);
-                }
-            }, duration * 1000);
-        }
-    }
-    
-    // Create coin block Super Mario style
-    function createCoinBlock() {
-        const coinBlock = document.createElement('div');
-        coinBlock.classList.add('coin-block');
-        coinBlock.style.position = 'absolute';
-        coinBlock.style.width = '50px';
-        coinBlock.style.height = '50px';
-        coinBlock.style.backgroundColor = '#E6B422';
-        coinBlock.style.boxShadow = '0 0 10px #FFD700';
-        coinBlock.style.borderRadius = '10px';
-        coinBlock.style.display = 'flex';
-        coinBlock.style.justifyContent = 'center';
-        coinBlock.style.alignItems = 'center';
-        coinBlock.style.color = 'white';
-        coinBlock.style.fontWeight = 'bold';
-        coinBlock.style.fontSize = '30px';
-        coinBlock.innerHTML = '?';
-        coinBlock.style.cursor = 'pointer';
-        
-        // Position randomly but within view
-        const padding = 100;
-        coinBlock.style.left = (padding + Math.random() * (window.innerWidth - padding * 2)) + 'px';
-        coinBlock.style.top = (padding + Math.random() * (window.innerHeight / 2 - padding * 2)) + 'px';
-        
-        document.body.appendChild(coinBlock);
-        
-        // Make block hittable
-        coinBlock.addEventListener('click', function() {
-            hitCoinBlock(coinBlock);
-        });
-        
-        // Periodically animate the block to draw attention
-        setInterval(() => {
-            if (Math.random() > 0.7) {
-                coinBlock.animate([
-                    { transform: 'translateY(0)' },
-                    { transform: 'translateY(-5px)' },
-                    { transform: 'translateY(0)' }
-                ], {
-                    duration: 300,
-                    easing: 'ease-out'
-                });
-            }
-        }, 3000);
-        
-        return coinBlock;
-    }
-    
-    // Hit animation for coin block
-    function hitCoinBlock(block) {
-        // Prevent multiple hits at once
-        if (block.dataset.hitting === 'true') return;
-        block.dataset.hitting = 'true';
-        
-        // Block bounce animation
-        block.animate([
-            { transform: 'translateY(0)' },
-            { transform: 'translateY(-15px)' },
-            { transform: 'translateY(0)' }
-        ], {
-            duration: 300,
-            easing: 'cubic-bezier(0.5, 0, 0.5, 1)'
-        });
-        
-        // Create coin animation
-        const blockRect = block.getBoundingClientRect();
-        const coin = document.createElement('div');
-        coin.style.position = 'absolute';
-        coin.style.left = (blockRect.left + blockRect.width / 2) + 'px';
-        coin.style.top = blockRect.top + 'px';
-        coin.style.width = '30px';
-        coin.style.height = '30px';
-        coin.style.backgroundColor = '#FFD700';
-        coin.style.borderRadius = '50%';
-        coin.style.transform = 'translateX(-50%)';
-        coin.style.zIndex = '100';
-        coin.style.boxShadow = '0 0 10px #FFFF00';
-        
-        document.body.appendChild(coin);
-        
-        // Coin jump animation
-        coin.animate([
-            { transform: 'translateX(-50%) translateY(0)', opacity: 1 },
-            { transform: 'translateX(-50%) translateY(-60px)', opacity: 1 },
-            { transform: 'translateX(-50%) translateY(-30px)', opacity: 0 }
-        ], {
-            duration: 700,
-            easing: 'cubic-bezier(0, 0.5, 0.5, 1)'
-        });
-        
-        // Show special effect after coin
-        setTimeout(() => {
-            // Create a random gift (heart, flower, or special text)
-            const gifts = ['❤️', '🌹', '💕', '😘'];
-            const gift = gifts[Math.floor(Math.random() * gifts.length)];
-            
-            const giftElement = document.createElement('div');
-            giftElement.style.position = 'absolute';
-            giftElement.style.left = (blockRect.left + blockRect.width / 2) + 'px';
-            giftElement.style.top = (blockRect.top - 50) + 'px';
-            giftElement.style.fontSize = '30px';
-            giftElement.style.transform = 'translateX(-50%)';
-            giftElement.style.zIndex = '100';
-            giftElement.style.opacity = '0';
-            giftElement.innerHTML = gift;
-            
-            document.body.appendChild(giftElement);
-            
-            // Animate the gift
-            giftElement.animate([
-                { transform: 'translateX(-50%) scale(0)', opacity: 0 },
-                { transform: 'translateX(-50%) scale(1.2)', opacity: 1 },
-                { transform: 'translateX(-50%) scale(1)', opacity: 1 },
-                { transform: 'translateX(-50%) scale(1)', opacity: 1 },
-                { transform: 'translateX(-50%) scale(1)', opacity: 0 }
-            ], {
-                duration: 2000,
-                easing: 'ease-out'
-            });
-            
-            // Remove the gift element after animation
-            setTimeout(() => {
-                if (giftElement.parentNode) {
-                    giftElement.parentNode.removeChild(giftElement);
-                }
-            }, 2000);
-            
-            // Reset block state
-            block.dataset.hitting = 'false';
-        }, 300);
-        
-        // Remove coin after animation
-        setTimeout(() => {
-            if (coin.parentNode) {
-                coin.parentNode.removeChild(coin);
-            }
-        }, 700);
-    }
-    
-    // Add Super Mario-style moving platforms
-    function createPlatforms() {
-        const platformsContainer = document.createElement('div');
-        platformsContainer.classList.add('platforms-container');
-        platformsContainer.style.position = 'absolute';
-        platformsContainer.style.width = '100%';
-        platformsContainer.style.height = '100%';
-        platformsContainer.style.pointerEvents = 'none';
-        platformsContainer.style.zIndex = '5';
-        
-        document.body.appendChild(platformsContainer);
-        
-        // Create multiple platforms
-        for (let i = 0; i < 3; i++) {
-            const platform = document.createElement('div');
-            platform.classList.add('platform');
-            platform.style.position = 'absolute';
-            platform.style.width = (100 + Math.random() * 100) + 'px';
-            platform.style.height = '20px';
-            platform.style.backgroundColor = '#8B4513'; // Brown wood color
-            platform.style.borderRadius = '5px';
-            platform.style.boxShadow = '0 3px 0 #5D3A1A, 0 5px 10px rgba(0,0,0,0.5)';
-            platform.style.bottom = (150 + i * 120) + 'px';
-            platform.style.left = (Math.random() * window.innerWidth) + 'px';
-            
-            platformsContainer.appendChild(platform);
-            
-            // Animate platform
-            animatePlatform(platform);
-        }
-    }
-    
-    // Animate a platform moving left and right
-    function animatePlatform(platform) {
-        // Random initial position and direction
-        let position = parseInt(platform.style.left);
-        let direction = Math.random() > 0.5 ? 1 : -1;
-        let speed = 0.5 + Math.random() * 1;
-        
-        function movePlatform() {
-            position += direction * speed;
-            
-            // Bounce at edges
-            if (position <= 0) {
-                position = 0;
-                direction = 1;
-            } else if (position >= window.innerWidth - platform.offsetWidth) {
-                position = window.innerWidth - platform.offsetWidth;
-                direction = -1;
-            }
-            
-            platform.style.left = position + 'px';
-            requestAnimationFrame(movePlatform);
         }
         
-        requestAnimationFrame(movePlatform);
-    }
+        requestAnimationFrame(animateHeart);
+    }, 800);
+}
+
+// Create a pulsing glow effect around the main heart
+function createHeartGlow() {
+    const heart = document.querySelector('.heart');
+    if (!heart) return;
     
-    // Add parallax effect for background
-    function setupParallax() {
-        document.addEventListener('mousemove', function(e) {
-            if (!animationSettings.specialEffectsEnabled) return;
-            
-            // Get mouse position relative to window center
-            const mouseX = e.clientX - window.innerWidth / 2;
-            const mouseY = e.clientY - window.innerHeight / 2;
-            
-            // Move stars with parallax effect (slow movement)
-            const stars = document.getElementById('stars');
-            stars.style.transform = `translate(${mouseX * 0.01}px, ${mouseY * 0.01}px)`;
-            
-            // Move flowers with parallax effect (faster movement)
-            const flowers = document.getElementById('flowers');
-            flowers.style.transform = `translate(${mouseX * 0.02}px, ${mouseY * 0.02}px)`;
-            
-            // Move title with parallax effect
-            const title = document.querySelector('h1');
-            title.style.transform = `translate(${mouseX * 0.03}px, ${mouseY * 0.03}px)`;
-            
-            // Move heart with parallax effect
-            const heart = document.querySelector('.heart');
-            if (heart) {
-                heart.style.transform = `rotateX(${mouseY * 0.05}deg) rotateY(${mouseX * 0.05}deg)`;
-            }
-        });
-    }
+    const glowLayer = document.createElement('div');
+    glowLayer.style.position = 'absolute';
+    glowLayer.style.width = '100%';
+    glowLayer.style.height = '100%';
+    glowLayer.style.borderRadius = '50%';
+    glowLayer.style.background = 'radial-gradient(circle, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 70%)';
+    glowLayer.style.opacity = '0';
+    glowLayer.style.transition = 'opacity 1s ease-in-out';
     
-    // Add keyboard controls for characters (Mario-style)
-    function setupKeyboardControls() {
-        // Reference to character state (defined in main.js)
-        let characterState;
-        if (typeof window.characterState !== 'undefined') {
-            characterState = window.characterState;
+    heart.appendChild(glowLayer);
+    
+    // Pulse glow effect
+    let increasing = true;
+    let opacity = 0;
+    
+    function pulseGlow() {
+        if (increasing) {
+            opacity += 0.01;
+            if (opacity >= 0.8) increasing = false;
         } else {
-            // Define fallback if main.js hasn't loaded yet
-            characterState = {
-                amine: {
-                    jumpPower: 0,
-                    direction: 1
-                },
-                douae: {
-                    jumpPower: 0,
-                    direction: -1
-                }
-            };
-            window.characterState = characterState;
+            opacity -= 0.01;
+            if (opacity <= 0) increasing = true;
         }
         
-        document.addEventListener('keydown', function(e) {
-            switch(e.key) {
-                case ' ':
-                case 'ArrowUp':
-                    // Jump (Amine)
-                    if (characterState.amine.jumpPower === 0) {
-                        characterState.amine.jumpPower = 30;
-                        amineChar.classList.add('jumping');
-                        setTimeout(() => {
-                            amineChar.classList.remove('jumping');
-                        }, 600);
-                    }
-                    break;
-                    
-                case 'w':
-                    // Jump (Douae)
-                    if (characterState.douae.jumpPower === 0) {
-                        characterState.douae.jumpPower = 30;
-                        douaeChar.classList.add('jumping');
-                        setTimeout(() => {
-                            douaeChar.classList.remove('jumping');
-                        }, 600);
-                    }
-                    break;
-                    
-                case 'h':
-                    // Heart effect between characters
-                    const amineRect = amineChar.getBoundingClientRect();
-                    const douaeRect = douaeChar.getBoundingClientRect();
-                    
-                    const centerX = (amineRect.right + douaeRect.left) / 2;
-                    const centerY = (amineRect.top + douaeRect.top) / 2;
-                    
-                    // Create heart effect
-                    for (let i = 0; i < 5; i++) {
-                        setTimeout(() => {
-                            const heartTrail = document.createElement('div');
-                            heartTrail.className = 'heart-trail';
-                            heartTrail.innerHTML = '❤️';
-                            heartTrail.style.left = centerX + 'px';
-                            heartTrail.style.top = centerY + 'px';
-                            document.body.appendChild(heartTrail);
-                            
-                            // Remove heart after animation
-                            setTimeout(() => {
-                                if (heartTrail.parentNode) {
-                                    heartTrail.parentNode.removeChild(heartTrail);
-                                }
-                            }, 2000);
-                        }, i * 200);
-                    }
-                    break;
-            }
-        });
+        glowLayer.style.opacity = opacity.toString();
+        requestAnimationFrame(pulseGlow);
     }
     
-    // Initialize animations
-    function initAnimations() {
-        createButterflies();
-        setupHeartbeat();
-        createPlatforms();
-        setupParallax();
-        setupKeyboardControls();
+    requestAnimationFrame(pulseGlow);
+}
+
+// Create falling petals that drift down the screen
+function createFallingPetals() {
+    const colors = [
+        '#ffb7c5', // light pink
+        '#ff80ab', // pink
+        '#ff4081', // deep pink
+        '#ff80ab', // pink
+        '#ffffff'  // white
+    ];
+    
+    function createPetal() {
+        const petal = document.createElement('div');
+        petal.className = 'flower';
+        petal.style.width = `${Math.random() * 10 + 5}px`;
+        petal.style.height = `${Math.random() * 10 + 5}px`;
+        petal.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        petal.style.borderRadius = '60% 40%';
+        petal.style.opacity = '0.8';
+        petal.style.left = `${Math.random() * 100}%`;
+        petal.style.top = '-10px';
+        petal.style.transform = `rotate(${Math.random() * 360}deg)`;
         
-        // Create a coin block after a delay
+        document.body.appendChild(petal);
+        
+        // Create falling animation
+        const duration = Math.random() * 8000 + 7000; // 7-15 seconds
+        const startTime = Date.now();
+        
+        function fall() {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            // Vertical position
+            const top = progress * (window.innerHeight + 20);
+            
+            // Horizontal oscillation
+            const amplitude = Math.random() * 200 + 50;
+            const frequency = Math.random() * 4 + 1;
+            const left = parseFloat(petal.style.left) + Math.sin(progress * Math.PI * frequency) * (amplitude / window.innerWidth * 100) / 40;
+            
+            // Rotation
+            const rotation = progress * (Math.random() * 720 - 360);
+            
+            petal.style.top = `${top}px`;
+            petal.style.left = `${left}%`;
+            petal.style.transform = `rotate(${rotation}deg)`;
+            
+            if (progress < 1) {
+                requestAnimationFrame(fall);
+            } else {
+                petal.remove();
+                createPetal();
+            }
+        }
+        
+        requestAnimationFrame(fall);
+    }
+    
+    // Create initial set of petals
+    for (let i = 0; i < 20; i++) {
         setTimeout(() => {
-            createCoinBlock();
-        }, 5000);
-        
-        // Make animations accessible to other scripts
-        window.romanceAnimations = {
-            createHeartTrail: function(x, y) {
-                const heart = document.createElement('div');
-                heart.className = 'heart-trail';
-                heart.innerHTML = '❤️';
-                heart.style.left = x + 'px';
-                heart.style.top = y + 'px';
-                document.body.appendChild(heart);
+            createPetal();
+        }, Math.random() * 5000);
+    }
+}
+
+// Create twinkling star effect in background
+function enhanceStars() {
+    const starsContainer = document.getElementById('stars');
+    if (!starsContainer) return;
+    
+    // Add shooting stars occasionally
+    setInterval(() => {
+        if (Math.random() > 0.7) { // 30% chance to create a shooting star
+            const shootingStar = document.createElement('div');
+            shootingStar.className = 'star';
+            shootingStar.style.position = 'absolute';
+            shootingStar.style.width = '2px';
+            shootingStar.style.height = '2px';
+            shootingStar.style.backgroundColor = '#fff';
+            shootingStar.style.borderRadius = '50%';
+            shootingStar.style.top = `${Math.random() * 30}%`;
+            shootingStar.style.left = `${Math.random() * 100}%`;
+            shootingStar.style.opacity = '0';
+            shootingStar.style.zIndex = '1';
+            
+            starsContainer.appendChild(shootingStar);
+            
+            // Create tail
+            const tail = document.createElement('div');
+            tail.style.position = 'absolute';
+            tail.style.top = '0';
+            tail.style.right = '0';
+            tail.style.width = '20px';
+            tail.style.height = '2px';
+            tail.style.background = 'linear-gradient(to left, rgba(255,255,255,0), #fff)';
+            tail.style.transform = 'translateX(100%)';
+            
+            shootingStar.appendChild(tail);
+            
+            // Animate shooting star
+            const duration = Math.random() * 1000 + 1000;
+            const angle = Math.random() * 20 + 20; // 20-40 degrees
+            const distance = Math.min(window.innerWidth, window.innerHeight) * 0.7;
+            const startTime = Date.now();
+            
+            function animateShootingStar() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
                 
-                setTimeout(() => {
-                    if (heart.parentNode) {
-                        heart.parentNode.removeChild(heart);
-                    }
-                }, 2000);
-            },
-            
-            triggerHeartExplosion: function(x, y) {
-                for (let i = 0; i < 15; i++) {
-                    setTimeout(() => {
-                        const offsetX = (Math.random() - 0.5) * 100;
-                        const offsetY = (Math.random() - 0.5) * 100;
-                        this.createHeartTrail(x + offsetX, y + offsetY);
-                    }, i * 100);
+                const x = progress * distance * Math.cos(angle * Math.PI / 180);
+                const y = progress * distance * Math.sin(angle * Math.PI / 180);
+                
+                shootingStar.style.transform = `translate(${x}px, ${y}px)`;
+                
+                // Fade in and out
+                let opacity;
+                if (progress < 0.2) {
+                    opacity = progress / 0.2;
+                } else if (progress > 0.8) {
+                    opacity = (1 - progress) / 0.2;
+                } else {
+                    opacity = 1;
                 }
-            },
-            
-            createCoinBlock: createCoinBlock,
-            
-            toggleSpecialEffects: function(enabled) {
-                animationSettings.specialEffectsEnabled = enabled;
+                
+                shootingStar.style.opacity = opacity.toString();
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animateShootingStar);
+                } else {
+                    shootingStar.remove();
+                }
             }
-        };
+            
+            requestAnimationFrame(animateShootingStar);
+        }
+    }, 3000);
+}
+
+// Make title text shimmer with a rainbow effect
+function createTitleShimmer() {
+    const title = document.querySelector('h1');
+    if (!title) return;
+    
+    // Split text into individual characters
+    const text = title.textContent;
+    title.textContent = '';
+    
+    for (let i = 0; i < text.length; i++) {
+        const charSpan = document.createElement('span');
+        charSpan.textContent = text[i];
+        charSpan.style.display = 'inline-block';
+        charSpan.style.transition = 'color 0.5s ease';
+        charSpan.style.animationDelay = `${i * 0.1}s`;
+        title.appendChild(charSpan);
     }
     
-    // Start animations
-    initAnimations();
+    // Animate color change
+    function animateColors() {
+        const spans = title.querySelectorAll('span');
+        const time = Date.now() / 1000;
+        
+        spans.forEach((span, index) => {
+            // Create a wave effect with different offsets for each character
+            const hue = (time * 50 + index * 10) % 360;
+            span.style.color = `hsl(${hue}, 80%, 70%)`;
+            
+            // Add slight vertical movement
+            const offset = Math.sin(time * 2 + index * 0.2) * 2;
+            span.style.transform = `translateY(${offset}px)`;
+        });
+        
+        requestAnimationFrame(animateColors);
+    }
+    
+    requestAnimationFrame(animateColors);
+}
+
+// Background color gradient animation
+function animateBackground() {
+    const body = document.body;
+    
+    // Create a subtle gradient background that shifts
+    function updateBackground() {
+        const time = Date.now() / 10000; // Slow cycle
+        
+        // Calculate gradient colors
+        const hue1 = (time * 30) % 360;
+        const hue2 = (hue1 + 40) % 360;
+        
+        const color1 = `hsla(${hue1}, 50%, 10%, 1)`;
+        const color2 = `hsla(${hue2}, 50%, 5%, 1)`;
+        
+        // Update gradient direction based on time
+        const angle = (time * 30) % 360;
+        
+        body.style.background = `linear-gradient(${angle}deg, ${color1}, ${color2})`;
+        
+        requestAnimationFrame(updateBackground);
+    }
+    
+    requestAnimationFrame(updateBackground);
+}
+
+// Initialize all basic animations
+document.addEventListener('DOMContentLoaded', function() {
+    // Start all animation functions
+    createButterflies();
+    createFloatingHearts();
+    createHeartGlow();
+    createFallingPetals();
+    enhanceStars();
+    createTitleShimmer();
+    animateBackground();
+    
+    // Create interactive heart pulse effect on page click
+    document.body.addEventListener('click', function(e) {
+        if (e.target.classList.contains('heart')) return;
+        
+        const ripple = document.createElement('div');
+        ripple.className = 'heart-trail';
+        ripple.innerHTML = '❤️';
+        ripple.style.position = 'absolute';
+        ripple.style.left = (e.clientX - 10) + 'px';
+        ripple.style.top = (e.clientY - 10) + 'px';
+        ripple.style.pointerEvents = 'none';
+        
+        document.body.appendChild(ripple);
+        
+        // Expand and fade out
+        let scale = 0.5;
+        let opacity = 1;
+        
+        function animate() {
+            scale += 0.03;
+            opacity -= 0.02;
+            
+            ripple.style.transform = `scale(${scale})`;
+            ripple.style.opacity = opacity;
+            
+            if (opacity > 0) {
+                requestAnimationFrame(animate);
+            } else {
+                ripple.remove();
+            }
+        }
+        
+        requestAnimationFrame(animate);
+    });
 });
