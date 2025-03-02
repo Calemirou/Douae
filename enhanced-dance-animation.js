@@ -23,9 +23,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function initCharacters() {
         if (!amine || !douae) return;
         
-        // Set initial positions
-        amine.style.left = '32%';
-        douae.style.right = '32%';
+        // Set initial positions to be centered at the bottom
+        amine.style.left = '42%';
+        amine.style.bottom = '5%';
+        
+        douae.style.right = '42%';
+        douae.style.bottom = '5%';
         
         // Make sure images have proper sizing
         if (amineImg && douaeImg) {
@@ -267,15 +270,15 @@ document.addEventListener('DOMContentLoaded', function() {
         specialMomentActive = true;
         
         // Save current positions
-        const currentAmineLeft = amine.style.left || '32%';
-        const currentDouaeRight = douae.style.right || '32%';
+        const currentAmineLeft = amine.style.left || '42%';
+        const currentDouaeRight = douae.style.right || '42%';
         
         // Make characters move closer
         amine.style.transition = 'left 2s ease-in-out';
-        amine.style.left = 'calc(50% - 80px)';
+        amine.style.left = 'calc(50% - 70px)';
         
         douae.style.transition = 'right 2s ease-in-out';
-        douae.style.right = 'calc(50% - 80px)';
+        douae.style.right = 'calc(50% - 70px)';
         
         // Start heart effect interval
         heartInterval = setInterval(createHeartEffect, 800);
