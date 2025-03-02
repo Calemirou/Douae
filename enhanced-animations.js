@@ -23,12 +23,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 height: 'auto',
                 objectFit: 'contain',
                 display: 'block',
-                margin: '0 auto'
+                margin: '0 auto',
+                position: 'relative',
+                maxWidth: '100%'
             };
             
             // Apply styles to both images
             [amineImg, douaeImg].forEach(img => {
-                Object.assign(img.style, imageStyle);
+                for (const prop in imageStyle) {
+                    img.style[prop] = imageStyle[prop];
+                }
             });
             
             // Make sure parent elements have consistent positioning
@@ -38,11 +42,26 @@ document.addEventListener('DOMContentLoaded', function() {
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    height: '100%'
+                    width: '100%',
+                    height: 'auto',
+                    padding: '0',
+                    margin: '0',
+                    overflow: 'visible'
                 };
                 
-                Object.assign(amine.style, containerStyle);
-                Object.assign(douae.style, containerStyle);
+                for (const prop in containerStyle) {
+                    amine.style[prop] = containerStyle[prop];
+                    douae.style[prop] = containerStyle[prop];
+                }
+                
+                // Check if parent container exists and apply consistent width
+                const container = document.querySelector('.container');
+                if (container) {
+                    container.style.display = 'flex';
+                    container.style.justifyContent = 'space-around';
+                    container.style.alignItems = 'center';
+                    container.style.width = '100%';
+                }
             }
         }
     }
@@ -245,100 +264,15 @@ document.addEventListener('DOMContentLoaded', function() {
         wind: 0.03
     });
     
-    // Advanced text effects
-    class TextScrambler {
-        constructor(element) {
-            this.element = element;
-            this.chars = '!<>-_\\/[]{}—=+*^?#________';
-            this.update = this.update.bind(this);
-        }
-        
-        setText(newText) {
-            const oldText = this.element.innerText;
-            const length = Math.max(oldText.length, newText.length);
-            const promise = new Promise((resolve) => this.resolve = resolve);
-            this.queue = [];
-            
-            for (let i = 0; i < length; i++) {
-                const from = oldText[i] || '';
-                const to = newText[i] || '';
-                const start = Math.floor(Math.random() * 40);
-                const end = start + Math.floor(Math.random() * 40);
-                this.queue.push({ from, to, start, end });
-            }
-            
-            cancelAnimationFrame(this.frameRequest);
-            this.frame = 0;
-            this.update();
-            return promise;
-        }
-        
-        update() {
-            let output = '';
-            let complete = 0;
-            
-            for (let i = 0, n = this.queue.length; i < n; i++) {
-                let { from, to, start, end, char } = this.queue[i];
-                
-                if (this.frame >= end) {
-                    complete++;
-                    output += to;
-                } else if (this.frame >= start) {
-                    if (!char || Math.random() < 0.28) {
-                        char = this.randomChar();
-                        this.queue[i].char = char;
-                    }
-                    output += `<span class="text-scramble-char">${char}</span>`;
-                } else {
-                    output += from;
-                }
-            }
-            
-            this.element.innerHTML = output;
-            
-            if (complete === this.queue.length) {
-                this.resolve();
-            } else {
-                this.frameRequest = requestAnimationFrame(this.update);
-                this.frame++;
-            }
-        }
-        
-        randomChar() {
-            return this.chars[Math.floor(Math.random() * this.chars.length)];
-        }
-    }
+    // Text scrambler functionality removed
     
-    // Initialize text scrambler for message element
-    const messageScrambler = messageElem ? new TextScrambler(messageElem) : null;
+    // Love message functionality removed as requested
     
-    // Collection of custom love messages to display
-    const loveMessages = [
-        "You are my everything, now and forever.",
-        "With you, every day feels like a beautiful dream.",
-        "Our love story is my favorite fairytale.",
-        "My heart belongs to you, only you.",
-        "You make the world more beautiful just by being in it.",
-        "I fall in love with you all over again each day.",
-        "My love for you grows stronger with each passing moment.",
-        "You are the missing piece that makes my life complete.",
-        "Every beat of my heart whispers your name.",
-        "Life with you is the greatest adventure."
-    ];
-    
-    // Change love message periodically
     function cycleMessages() {
-        if (!messageScrambler) return;
-        
-        let currentIndex = 0;
-        
-        // Initial message
-        messageScrambler.setText(loveMessages[0]);
-        
-        setInterval(() => {
-            currentIndex = (currentIndex + 1) % loveMessages.length;
-            messageScrambler.setText(loveMessages[currentIndex]);
-        }, 8000);
+        // Message cycling functionality removed
+        if (messageElem) {
+            messageElem.style.display = 'none'; // Hide the message element
+        }
     }
     
     // 3D tilt effect for the heart
