@@ -345,13 +345,13 @@
             cursor: pointer;
             z-index: 101;
         }
-        
+		
         /* Character animations */
         .characters-container {
             position: fixed;
             bottom: 10%;
             width: 100%;
-            height: 180px; /* Increased from 150px */
+            height: 180px;
             z-index: 20;
             pointer-events: none;
             overflow: hidden;
@@ -364,19 +364,19 @@
         }
         
         .character img {
-            height: 150px; /* Increased from 120px - bigger than Mario */
+            height: 150px;
             width: auto;
             filter: drop-shadow(0 5px 5px rgba(0,0,0,0.3));
             transform-origin: bottom center;
         }
         
         .amine {
-            left: -150px; /* Start off-screen, adjusted for larger size */
+            left: -150px;
             z-index: 21;
         }
         
         .douae {
-            right: -150px; /* Start off-screen, adjusted for larger size */
+            right: -150px;
             z-index: 20;
         }
         
@@ -391,7 +391,8 @@
             animation: walk 0.8s infinite;
         }
         
-        /* Jumping animation */
+        /* All your other CSS styles here */
+		/* Jumping animation */
         @keyframes jump {
             0%, 100% { transform: translateY(0) scale(1); }
             50% { transform: translateY(-30px) scale(1.1); }
@@ -468,14 +469,14 @@
         /* Pause animation to show reaction */
         .paused img {
             animation-play-state: paused;
-        }
+        }				 
     </style>
 </head>
 <body>
     <div class="stars" id="stars"></div>
     <div class="flowers" id="flowers"></div>
     
-    <!-- Character container - add right after flowers div -->
+    <!-- Character container with corrected image paths -->
     <div class="characters-container" id="charactersContainer">
         <div class="character amine" id="amine">
             <img src="Amine.png" alt="Amine Character">
@@ -521,6 +522,78 @@
             backgroundMusic.volume = 0.5;
             let musicEnabled = true;
             
+            // Characters animation
+            const amineChar = document.getElementById('amine');
+            const douaeChar = document.getElementById('douae');
+            let charactersVisible = false;
+            
+            // Make sure characters start in correct positions
+            amineChar.style.left = "-150px";
+            douaeChar.style.right = "-150px";
+            
+            // Start character animation after a delay
+            setTimeout(startCharacterAnimation, 3000);
+            
+            function startCharacterAnimation() {
+                // Add walking class to both characters
+                amineChar.classList.add('walking');
+                douaeChar.classList.add('walking');
+                
+                // Animate Amine walking in from left
+                const amineAnim = amineChar.animate(
+                    [
+                        { left: '-150px' },
+                        { left: '30%' }
+                    ],
+                    {
+                        duration: 5000,
+                        fill: 'forwards',
+                        easing: 'ease-in-out'
+                    }
+                );
+                
+                // Animate Douae walking in from right
+                const douaeAnim = douaeChar.animate(
+                    [
+                        { right: '-150px' },
+                        { right: '30%' }
+                    ],
+                    {
+                        duration: 5000,
+                        fill: 'forwards',
+                        easing: 'ease-in-out'
+                    }
+                );
+                
+                // When both characters meet, show gifts and reactions
+                setTimeout(() => {
+                    // Stop walking
+                    amineChar.classList.remove('walking');
+                    douaeChar.classList.remove('walking');
+                    
+                    // Show gift
+                    const flowerGift = amineChar.querySelector('.gift.flower');
+                    flowerGift.classList.remove('hidden');
+                    flowerGift.classList.add('visible');
+                    
+                    // After receiving gift, show reaction
+                    setTimeout(() => {
+                        const loveReaction = douaeChar.querySelector('.reaction.love');
+                        loveReaction.classList.remove('hidden');
+                        loveReaction.classList.add('visible');
+                        
+                        // Make the reaction float
+                        loveReaction.classList.add('floating');
+                    }, 1000);
+                    
+                    // Both characters happy bounce animation
+                    amineChar.classList.add('happy-meeting');
+                    douaeChar.classList.add('happy-meeting');
+                    
+                    charactersVisible = true;
+                }, 5000);
+            }
+            
             // Need user interaction to start audio
             document.addEventListener('click', function() {
                 if (musicEnabled) {
@@ -534,6 +607,11 @@
                     setTimeout(() => {
                         backgroundMusic.play().catch(e => console.log('Audio play failed:', e));
                     }, 100);
+                    
+                    // If first click and characters not started yet, start them
+                    if (!charactersVisible) {
+                        startCharacterAnimation();
+                    }
                 }
             }, { once: true });
             
