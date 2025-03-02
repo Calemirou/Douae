@@ -1,4 +1,4 @@
-// animations-music.js - Character dancing animations synced with music
+// animations-music.js - Character dancing animations with fixed timing
 
 document.addEventListener('DOMContentLoaded', function() {
     // Elements
@@ -9,14 +9,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const backgroundMusic = document.getElementById('backgroundMusic');
     const musicToggle = document.getElementById('musicToggle');
     
-    // Beat detection variables
-    let audioContext;
-    let analyser;
-    let dataArray;
-    let beatHistory = [];
-    let lastBeatTime = 0;
-    let currentBeatCount = 0;
+    // Dance state tracking
     let danceState = 0;
+    let danceInterval = null;
     
     // Dance animation states
     const danceStates = {
@@ -26,107 +21,6 @@ document.addEventListener('DOMContentLoaded', function() {
         LEAN: 3,
         WAVE: 4
     };
-    
-    // Initialize audio context and beat detection
-    function initAudio() {
-        try {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const source = audioContext.createMediaElementSource(backgroundMusic);
-            analyser = audioContext.createAnalyser();
-            
-            // Connect the source to the analyzer and then to the destination
-            source.connect(analyser);
-            analyser.connect(audioContext.destination);
-            
-            // Set up analyzer
-            analyser.fftSize = 256;
-            const bufferLength = analyser.frequencyBinCount;
-            dataArray = new Uint8Array(bufferLength);
-            
-            // Start detecting beats
-            detectBeats();
-        } catch (e) {
-            console.error('Web Audio API error:', e);
-        }
-    }
-    
-    // Beat detection function
-    function detectBeats() {
-        if (!backgroundMusic.paused) {
-            requestAnimationFrame(detectBeats);
-            
-            // Get frequency data
-            analyser.getByteFrequencyData(dataArray);
-            
-            // Calculate average energy of low frequencies (bass)
-            const lowFreqAvg = getAverageEnergy(dataArray, 0, 10);
-            
-            // Update beat history
-            beatHistory.push(lowFreqAvg);
-            if (beatHistory.length > 20) {
-                beatHistory.shift();
-            }
-            
-            // Calculate local average 
-            const localAvg = beatHistory.reduce((sum, value) => sum + value, 0) / beatHistory.length;
-            
-            // Check for beats (significant increases in energy)
-            const now = Date.now();
-            if (lowFreqAvg > localAvg * 1.3 && now - lastBeatTime > 250) {
-                lastBeatTime = now;
-                onBeat();
-            }
-        } else {
-            requestAnimationFrame(detectBeats);
-        }
-    }
-    
-    // Calculate average energy for a frequency range
-    function getAverageEnergy(dataArray, startBin, endBin) {
-        let sum = 0;
-        for (let i = startBin; i <= endBin; i++) {
-            sum += dataArray[i];
-        }
-        return sum / (endBin - startBin + 1);
-    }
-    
-    // Actions to take on detected beats
-    function onBeat() {
-        // Only animate if characters exist
-        if (!amine || !douae) return;
-        
-        // Count beats to change dance moves
-        currentBeatCount++;
-        
-        // Change dance move every 8 beats
-        if (currentBeatCount % 8 === 0) {
-            danceState = (danceState + 1) % 5; // Cycle through dance states
-        }
-        
-        // Perform dance move based on current state
-        switch (danceState) {
-            case danceStates.SIDE_TO_SIDE:
-                danceSideToSide();
-                break;
-            case danceStates.JUMP:
-                danceJump();
-                break;
-            case danceStates.SPIN:
-                danceSpin();
-                break;
-            case danceStates.LEAN:
-                danceLean();
-                break;
-            case danceStates.WAVE:
-                danceWave();
-                break;
-        }
-        
-        // Create heart effect occasionally
-        if (Math.random() > 0.7) {
-            createHeartEffect();
-        }
-    }
     
     // Side to side dance move
     function danceSideToSide() {
@@ -140,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
         douaeImg.style.transition = 'transform 0.3s ease-out';
         douaeImg.style.transform = 'translateX(10px)';
         
-        // Return to center on next beat
+        // Return to center after a moment
         setTimeout(() => {
             amineImg.style.transform = 'translateX(10px)';
             douaeImg.style.transform = 'translateX(-10px)';
@@ -208,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function() {
         douaeImg.style.transition = 'transform 0.3s ease-out';
         douaeImg.style.transform = 'rotate(-15deg)';
         
-        // Return to upright on next beat
+        // Return to upright
         setTimeout(() => {
             amineImg.style.transform = 'rotate(-10deg)';
             douaeImg.style.transform = 'rotate(10deg)';
@@ -354,6 +248,53 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     }
     
+    // Perform a dance move based on current state
+    function performDance() {
+        // Cycle through dance states
+        danceState = (danceState + 1) % 5;
+        
+        switch (danceState) {
+            case danceStates.SIDE_TO_SIDE:
+                danceSideToSide();
+                break;
+            case danceStates.JUMP:
+                danceJump();
+                break;
+            case danceStates.SPIN:
+                danceSpin();
+                break;
+            case danceStates.LEAN:
+                danceLean();
+                break;
+            case danceStates.WAVE:
+                danceWave();
+                break;
+        }
+        
+        // Create heart effect occasionally
+        if (Math.random() > 0.7) {
+            createHeartEffect();
+        }
+    }
+    
+    // Start regular dance interval
+    function startDancing() {
+        if (danceInterval) {
+            clearInterval(danceInterval);
+        }
+        
+        // Dance every 1.2 seconds (approximately 50 BPM)
+        danceInterval = setInterval(performDance, 1200);
+    }
+    
+    // Stop dancing
+    function stopDancing() {
+        if (danceInterval) {
+            clearInterval(danceInterval);
+            danceInterval = null;
+        }
+    }
+    
     // Create dance timeline based on song sections
     function createDanceTimeline() {
         if (!backgroundMusic) return;
@@ -389,12 +330,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (backgroundMusic.paused) {
                 backgroundMusic.play()
                     .then(() => {
-                        // Only initialize audio context after user interaction
-                        if (!audioContext) {
-                            initAudio();
-                        } else if (audioContext.state === 'suspended') {
-                            audioContext.resume();
-                        }
+                        startDancing();
                         musicToggle.textContent = '🎵 Music On';
                     })
                     .catch(err => {
@@ -402,31 +338,32 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
             } else {
                 backgroundMusic.pause();
+                stopDancing();
                 musicToggle.textContent = '🎵 Music Off';
             }
         });
     }
     
+    // Handle song ending
+    if (backgroundMusic) {
+        backgroundMusic.addEventListener('ended', function() {
+            backgroundMusic.currentTime = 0;
+            backgroundMusic.play();
+        });
+    }
+    
     // Initialize dancing animations
     function init() {
-        // Check if song ended and loop
-        if (backgroundMusic) {
-            backgroundMusic.addEventListener('ended', function() {
-                backgroundMusic.currentTime = 0;
-                backgroundMusic.play();
-            });
-            
-            // Auto-play music after a short delay (many browsers require user interaction)
-            setTimeout(() => {
-                backgroundMusic.play()
-                    .then(() => {
-                        initAudio();
-                    })
-                    .catch(err => {
-                        console.log('Auto-play prevented. Click music toggle to play.', err);
-                    });
-            }, 1000);
-        }
+        // Auto-play music after a short delay (many browsers require user interaction)
+        setTimeout(() => {
+            backgroundMusic.play()
+                .then(() => {
+                    startDancing();
+                })
+                .catch(err => {
+                    console.log('Auto-play prevented. Click music toggle to play.', err);
+                });
+        }, 1000);
         
         // Set up dance timeline
         createDanceTimeline();
