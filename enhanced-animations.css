@@ -3,17 +3,20 @@
 /* Character animations */
 .characters-container {
     position: fixed;
-    bottom: 10%;
+    bottom: 0;
     width: 100%;
     height: 220px;
     z-index: 20;
     pointer-events: none;
     overflow: visible;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
 }
 
 .character {
     position: absolute;
-    bottom: 0;
+    bottom: 5%;
     transform-origin: bottom center;
     transition: all 0.5s ease;
 }
@@ -27,12 +30,12 @@
 }
 
 .amine {
-    left: 32%;
+    left: 42%;
     z-index: 21;
 }
 
 .douae {
-    right: 32%;
+    right: 42%;
     z-index: 20;
 }
 
