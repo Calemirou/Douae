@@ -640,69 +640,24 @@
                 }, i * 1000);
             }
             
-            // Lyrics data updated to match the structure provided
+            // Lyrics data updated with Arabic lyrics from SRT
             const lyricsData = [
-                // Hook
-                { time: 0.0, text: "Tick-tock, watching clocks ♪" },
-                { time: 4.0, text: "Dreams fade as my heart blocks ♪" },
-                { time: 8.28, text: "Every day, same old way ♪" },
-                { time: 12.66, text: "Fighting just to say I'm okay ♪" },
-                // Hook repeat
-                { time: 17.14, text: "Tick-tock, watching clocks ♪" },
-                { time: 21.26, text: "Dreams fade as my heart blocks ♪" },
-                { time: 25.64, text: "Every day, same old way ♪" },
-                { time: 29.54, text: "Fighting just to say I'm okay ♪" },
-                
-                // Verse 1
-                { time: 33.98, text: "Started with a vision, had a mission, now I'm wishin' ♪" },
-                { time: 39.099, text: "Could've made different decisions, now I'm missin' ♪" },
-                { time: 41.32, text: "All the chances that I had, looking back it makes me sad ♪" },
-                { time: 50.34, text: "Twenty-eight and feeling mad, was it all just a fad? ♪" },
-                
-                // Pre-Chorus
-                { time: 60.7, text: "Working minimum wage ♪" },
-                { time: 62.8, text: "Stuck inside this cage ♪" },
-                { time: 64.54, text: "Turn another page ♪" },
-                { time: 66.6, text: "Can't escape this stage ♪" },
-                
-                // Chorus
-                { time: 69.46, text: "I wanted stars (wanted stars) ♪" },
-                { time: 71.24, text: "But all I got were scars (were scars) ♪" },
-                { time: 77.359, text: "Tried to reach the moon (the moon) ♪" },
-                { time: 79.76, text: "But fell down way too soon (too soon) ♪" },
-                { time: 85.64, text: "Mama I'm sorry (I'm sorry) ♪" },
-                { time: 88.9, text: "I let you down, it's haunting me (haunting me) ♪" },
-                
-                // Verse 2
-                { time: 96.42, text: "Three AM, walking home again ♪" },
-                { time: 99.98, text: "Pocket empty, heart full of pain ♪" },
-                { time: 104.42, text: "Watch my friends on Instagram ♪" },
-                { time: 108.24, text: "Living life while here I am ♪" },
-                { time: 113.2, text: "Stuck in cycles, never changing ♪" },
-                { time: 115.62, text: "Life keeps rearranging ♪" },
-                
-                // Bridge
-                { time: 120.86, text: "Remember when we used to say ♪" },
-                { time: 126.2, text: "One day we would find a way ♪" },
-                { time: 130.12, text: "Now I'm just trying to survive ♪" },
-                { time: 133.36, text: "Barely keeping dreams alive ♪" },
-                { time: 135.28, text: "(Barely keeping dreams alive) ♪" },
-                
-                // Verse 3
-                { time: 138.94, text: "Bills keep stacking, mind keeps cracking ♪" },
-                { time: 142.48, text: "Time keeps passing, no more acting ♪" },
-                { time: 144.88, text: "Like it's all gonna be fine ♪" },
-                { time: 148.44, text: "Like I'm gonna see the signs ♪" },
-                { time: 152.8, text: "Of better days ahead of me ♪" },
-                { time: 158.45, text: "Of all I was meant to be ♪" },
-                
-                // Outro
-                { time: 162.94, text: "Tick-tock (time fades) ♪" },
-                { time: 165.94, text: "Game stops (dreams fade) ♪" },
-                { time: 168.94, text: "Life drops (heart breaks) ♪" },
-                { time: 171.94, text: "Hope walks away... ♪" }
+                { time: 0.0, text: "يا دعاء" },
+                { time: 10.84, text: "يا دعاء يا دعاء يا دعاء خليتي قلبي معاك لا" },
+                { time: 21.84, text: "تخافي ما ننساك ما كاين حتى شي واحدة في قلبي معاك" },
+                { time: 33.959, text: "بنت الناس عقلي طاح قلبي طار ما" },
+                { time: 48.46, text: "عندي فين نرتاح نتي عندي أحلى صباح كل ما نشوفك تزيد" },
+                { time: 57.0, text: "الأفراح وكل ما نشوفك تزيد الأفراح يا دعاء يا دعاء" },
+                { time: 76.349, text: "زينك زين ما عندو حدود شفتك غير قلبي تايدوب كل نهار" },
+                { time: 94.549, text: "نتمنى نشوفك وحدك نتي سبابي نتوب يا دعاء يا دعاء" },
+                { time: 109.809, text: "واعدك غير نكون معاك حبي ليك غادي نوريك مهما صرى" },
+                { time: 122.469, text: "ما نخليك نتي الزين اللي خلاني نبغيك يا ملاك نور حياتي في قربك كل" },
+                { time: 135.829, text: "نجاتي ما نقدر نعيش بلا بيك نتي سبب كل سعادتي كل" },
+                { time: 148.569, text: "سعادتي يا دعاء يا دعاء عيونك بحر الأسرار ضحكتك" },
+                { time: 164.469, text: "تنور نهار كل شي فيك يسحرني وانتي عندي أجمل الأقدار" },
+                { time: 173.649, text: "قلبك طيب شبعان حنان حبك لي أغلى الأمان عاهدتك نبقى" },
+                { time: 188.749, text: "وفي حبك سكن في الوجدان يا دعاء يا دعاء" }
             ];
-
             // Get DOM elements for lyrics
             const lyricsContainer = document.getElementById('lyricsContainer');
             const lyricsWrapper = document.getElementById('lyricsWrapper');
