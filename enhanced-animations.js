@@ -15,17 +15,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const WINDOW_HEIGHT = window.innerHeight;
     
     // Fix PNG alignment
-    function fixImageAlignment() {
+ function fixImageAlignment() {
         if (amineImg && douaeImg) {
-            // Set to initial size without stretching
+            // Adjust sizing to resemble Super Mario character style
             const imageStyle = {
                 width: 'auto',           // Keep original width
-                height: 'auto',          // Keep original height
-                maxWidth: '250px',       // Prevent from being too large
-                objectFit: 'initial',    // Don't force any specific sizing
+                height: '180px',         // Fixed height similar to Super Mario characters
+                maxWidth: '300px',       // Prevent from being too large
+                objectFit: 'contain',    // Ensure full image is visible
                 display: 'block',
                 margin: '0 auto',
-                position: 'relative'
+                position: 'relative',
+                bottom: '-20px',         // Adjust to "ground" level
+                imageRendering: 'pixelated', // For pixel art-like appearance
+                filter: 'drop-shadow(0 5px 5px rgba(0,0,0,0.3))' // Maintain shadow
             };
             
             // Apply styles to both images
@@ -43,11 +46,11 @@ document.addEventListener('DOMContentLoaded', function() {
             if (amine && douae) {
                 const containerStyle = {
                     position: 'relative',
-                    display: 'inline-block', // Changed from flex to inline-block
+                    display: 'inline-block',
                     textAlign: 'center',
                     width: 'auto',
-                    height: 'auto',
-                    padding: '10px',
+                    height: '220px',     // Consistent container height
+                    padding: '0',
                     margin: '0 10px',
                     overflow: 'visible'
                 };
@@ -57,13 +60,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     douae.style[prop] = containerStyle[prop];
                 }
                 
-                // Check if parent container exists and apply consistent width
+                // Adjust positioning to ensure characters are at bottom
+                amine.style.position = 'absolute';
+                douae.style.position = 'absolute';
+                amine.style.bottom = '0';
+                douae.style.bottom = '0';
+                
+                // Check if parent container exists and apply consistent styling
                 const container = document.querySelector('.container');
                 if (container) {
+                    container.style.position = 'relative';
                     container.style.display = 'flex';
                     container.style.justifyContent = 'center';
-                    container.style.alignItems = 'center';
-                    container.style.flexWrap = 'nowrap';
+                    container.style.alignItems = 'flex-end';
+                    container.style.height = '300px';  // Ensure enough space for characters
+                    container.style.overflow = 'hidden';
                 }
             }
         }
