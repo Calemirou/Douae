@@ -1,490 +1,263 @@
-/**
- * animations-music.js - Music and audio control functions for the "I Love You Douae" webpage
- * This file contains the music player functionality and synchronization with animations
- */
+// animations-music.js - Music synchronized animations
 
-// Initialize music player system
-function initMusicPlayer() {
-    // Background music setup
+// Sample lyrics with timestamps (modify with actual lyrics and timestamps)
+const lyrics = [
+    { time: 0, text: "يا دعاء" },
+    { time: 5, text: "حبيتك من قلبي" },
+    { time: 10, text: "أنت حياتي وسعادتي" },
+    { time: 15, text: "كل لحظة معك غالية" },
+    { time: 20, text: "أنت نور حياتي" },
+    { time: 25, text: "وحبك هو قوتي" },
+    { time: 30, text: "عيناك تسحرني" },
+    { time: 35, text: "وابتسامتك تذيب قلبي" },
+    { time: 40, text: "يا أجمل ما في حياتي" },
+    { time: 45, text: "أحبك حبيبتي" },
+    { time: 50, text: "وسأظل أحبك للأبد" },
+    // Add more lyrics to cover the entire 3:31 duration
+    { time: 60, text: "كل يوم معك هو هدية" },
+    { time: 70, text: "أحلم بك ليل نهار" },
+    { time: 80, text: "قلبي ينبض بحبك" },
+    { time: 90, text: "أنت سر سعادتي" },
+    { time: 100, text: "حبك يملأ حياتي" },
+    { time: 110, text: "أنت روحي وقلبي" },
+    { time: 120, text: "معك أرى العالم أجمل" },
+    { time: 130, text: "أحبك من كل قلبي" },
+    { time: 140, text: "وأعيش لأجلك" },
+    { time: 150, text: "حياتي بدونك لا معنى لها" },
+    { time: 160, text: "سأحبك إلى الأبد" },
+    { time: 170, text: "يا دعاء حبيبتي" },
+    { time: 180, text: "أنت سر سعادتي وفرحتي" },
+    { time: 190, text: "معك أشعر بالحب الحقيقي" },
+    { time: 200, text: "يا دعاء" }
+];
+
+// Music animation timeline (key moments in the song)
+const animationTimeline = [
+    { time: 0, action: 'start' },
+    { time: 5, action: 'amineEnter' },
+    { time: 10, action: 'douaeEnter' },
+    { time: 15, action: 'amineWave' },
+    { time: 20, action: 'douaeWave' },
+    { time: 25, action: 'amineDance' },
+    { time: 30, action: 'douaeDance' },
+    { time: 35, action: 'meet' },
+    { time: 40, action: 'hearts' },
+    { time: 45, action: 'amineGiftFlower' },
+    { time: 50, action: 'douaeReactionLove' },
+    { time: 55, action: 'bothJump' },
+    { time: 60, action: 'bothSpin' },
+    { time: 65, action: 'amineGiftHeart' },
+    { time: 70, action: 'douaeReactionHappy' },
+    { time: 75, action: 'moveAround' },
+    { time: 85, action: 'bothDance' },
+    { time: 95, action: 'amineGiftBox' },
+    { time: 100, action: 'douaeReactionSurprise' },
+    { time: 105, action: 'kiss' },
+    { time: 110, action: 'hearts' },
+    { time: 120, action: 'bothJump' },
+    { time: 130, action: 'amineDance' },
+    { time: 140, action: 'douaeDance' },
+    { time: 150, action: 'bothSpin' },
+    { time: 160, action: 'moveAround' },
+    { time: 170, action: 'meet' },
+    { time: 180, action: 'hearts' },
+    { time: 190, action: 'finale' },
+    { time: 200, action: 'end' }
+];
+
+function initializeMusicSyncedAnimations() {
     const backgroundMusic = document.getElementById('backgroundMusic');
-    if (!backgroundMusic) return;
+    const amine = document.getElementById('amine');
+    const douae = document.getElementById('douae');
+    const lyricsContainer = document.getElementById('lyricsContainer');
+    const currentLyric = document.getElementById('currentLyric');
     
-    backgroundMusic.volume = 0.5;
-    let musicEnabled = true;
+    // Set up lyrics display
+    let currentLyricIndex = 0;
     
-    // Toggle music button functionality
-    const musicToggle = document.getElementById('musicToggle');
-    if (musicToggle) {
-        musicToggle.addEventListener('click', function() {
-            musicEnabled = !musicEnabled;
-            musicToggle.textContent = musicEnabled ? '🎵 Music On' : '🎵 Music Off';
-            
-            if (musicEnabled) {
-                backgroundMusic.play().catch(e => console.log('Audio play failed:', e));
-            } else {
-                backgroundMusic.pause();
-            }
-        });
-    }
+    // Timeline execution
+    let currentTimelineIndex = 0;
     
-    // Need user interaction to start audio (browser requirement)
-    let firstInteractionHandled = false;
-    document.addEventListener('click', function() {
-        if (!firstInteractionHandled && musicEnabled) {
-            // Request preload of lyrics
-            const requestPreload = true;
-            
-            // Preload audio for faster start
-            backgroundMusic.load();
-            
-            // Small delay to allow preloading
-            setTimeout(() => {
-                backgroundMusic.play().catch(e => console.log('Audio play failed:', e));
-            }, 100);
-            
-            firstInteractionHandled = true;
-        }
-    }, { once: true });
-    
-    // Synchronize music with animations
-    backgroundMusic.addEventListener('timeupdate', function() {
-        // This event fires frequently as the music plays
-        // Use it to trigger time-based animation events
+    // Update lyrics based on current time
+    function updateLyrics() {
         const currentTime = backgroundMusic.currentTime;
         
-        // Example: Trigger a special animation at a specific timestamp
-        triggerTimedAnimations(currentTime);
-    });
-    
-    // When music ends or loops, reset any needed animation states
-    backgroundMusic.addEventListener('ended', function() {
-        if (backgroundMusic.loop) {
-            resetAnimationStates();
-        }
-    });
-}
-
-// Trigger animations at specific timestamps in the music
-function triggerTimedAnimations(currentTime) {
-    // Define key moments in the song (in seconds)
-    const keyMoments = [
-        { time: 10.8, event: 'chorus1Start' },
-        { time: 34.9, event: 'verse2Start' },
-        { time: 57.0, event: 'chorus2Start' },
-        { time: 76.3, event: 'verse3Start' },
-        { time: 109.8, event: 'bridge1Start' },
-        { time: 148.5, event: 'chorus3Start' },
-        { time: 188.7, event: 'outroStart' }
-    ];
-    
-    // Find any key moments that are occurring now (within a small threshold)
-    const threshold = 0.1; // 100ms threshold
-    for (const moment of keyMoments) {
-        if (Math.abs(currentTime - moment.time) < threshold) {
-            // This key moment is happening now, trigger the associated animation
-            triggerMusicSyncedAnimation(moment.event);
-            break; // Only trigger one event per check
-        }
-    }
-}
-
-// Handle different music-synced animation events
-function triggerMusicSyncedAnimation(eventName) {
-    // Get character elements
-    const amineChar = document.getElementById('amine');
-    const douaeChar = document.getElementById('douae');
-    
-    if (!amineChar || !douaeChar) return;
-    
-    // Trigger different animations based on the music event
-    switch (eventName) {
-        case 'chorus1Start':
-            // Create heart burst
-            createHeartBurst();
-            // Make characters do a short dance
-            amineChar.classList.add('happy-meeting');
-            douaeChar.classList.add('happy-meeting');
-            setTimeout(() => {
-                amineChar.classList.remove('happy-meeting');
-                douaeChar.classList.remove('happy-meeting');
-            }, 1000);
-            break;
-            
-        case 'verse2Start':
-            // Make Amine present a gift
-            showGift(amineChar, 'heart');
-            hideGift(amineChar, 'flower');
-            
-            // Make Douae react
-            showReaction(douaeChar, 'surprise');
-            hideReaction(douaeChar, 'love');
-            break;
-            
-        case 'chorus2Start':
-            // Create butterflies around characters
-            const amineRect = amineChar.getBoundingClientRect();
-            const douaeRect = douaeChar.getBoundingClientRect();
-            
-            for (let i = 0; i < 5; i++) {
-                setTimeout(() => {
-                    createButterfly(
-                        amineRect.left + Math.random() * amineRect.width,
-                        amineRect.top + Math.random() * amineRect.height
-                    );
-                    createButterfly(
-                        douaeRect.left + Math.random() * douaeRect.width,
-                        douaeRect.top + Math.random() * douaeRect.height
-                    );
-                }, i * 200);
-            }
-            break;
-            
-        case 'verse3Start':
-            // Switch gift
-            showGift(amineChar, 'gift-box');
-            hideGift(amineChar, 'heart');
-            
-            // Switch reaction
-            showReaction(douaeChar, 'happy');
-            hideReaction(douaeChar, 'surprise');
-            break;
-            
-        case 'bridge1Start':
-            // Create heart trail between characters
-            createHeartTrail(amineChar, douaeChar);
-            break;
-            
-        case 'chorus3Start':
-            // Create firework effect
-            createFireworkEffect();
-            break;
-            
-        case 'outroStart':
-            // Grand finale
-            createGrandFinale();
-            break;
-    }
-}
-
-// Create a heart burst animation around the center
-function createHeartBurst() {
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
-    
-    // Create hearts in a circular pattern
-    for (let i = 0; i < 12; i++) {
-        setTimeout(() => {
-            const angle = (i / 12) * Math.PI * 2;
-            const distance = 100;
-            const x = centerX + Math.cos(angle) * distance;
-            const y = centerY + Math.sin(angle) * distance;
-            
-            createHeartParticle(x, y);
-        }, i * 50);
-    }
-}
-
-// Reset animation states when music loops
-function resetAnimationStates() {
-    // Hide all gifts and reactions on characters
-    const amineChar = document.getElementById('amine');
-    const douaeChar = document.getElementById('douae');
-    
-    if (!amineChar || !douaeChar) return;
-    
-    // Hide all gifts
-    hideGift(amineChar, 'flower');
-    hideGift(amineChar, 'heart');
-    hideGift(amineChar, 'gift-box');
-    
-    // Hide all reactions
-    hideReaction(douaeChar, 'love');
-    hideReaction(douaeChar, 'surprise');
-    hideReaction(douaeChar, 'happy');
-    
-    // Show initial gift and reaction
-    showGift(amineChar, 'flower');
-    showReaction(douaeChar, 'love');
-}
-
-// Main initialization function to be called from HTML
-function initMusicSystem() {
-    // Initialize the music player
-    initMusicPlayer();
-}
-
-// If these functions are referenced from animations.js, make sure they're available
-// These are just stub implementations if they aren't already defined elsewhere
-if (typeof showGift !== 'function') {
-    function showGift(character, giftType) {
-        const gift = character.querySelector(`.gift.${giftType}`);
-        if (gift) {
-            gift.classList.remove('hidden');
-            gift.classList.add('visible');
-            gift.classList.add('floating');
-        }
-    }
-}
-
-if (typeof hideGift !== 'function') {
-    function hideGift(character, giftType) {
-        const gift = character.querySelector(`.gift.${giftType}`);
-        if (gift) {
-            gift.classList.remove('visible', 'floating');
-            gift.classList.add('hidden');
-        }
-    }
-}
-
-if (typeof showReaction !== 'function') {
-    function showReaction(character, reactionType) {
-        const reaction = character.querySelector(`.reaction.${reactionType}`);
-        if (reaction) {
-            reaction.classList.remove('hidden');
-            reaction.classList.add('visible');
-            reaction.classList.add('floating');
-        }
-    }
-}
-
-if (typeof hideReaction !== 'function') {
-    function hideReaction(character, reactionType) {
-        const reaction = character.querySelector(`.reaction.${reactionType}`);
-        if (reaction) {
-            reaction.classList.remove('visible', 'floating');
-            reaction.classList.add('hidden');
-        }
-    }
-}
-
-if (typeof createHeartParticle !== 'function') {
-    function createHeartParticle(x, y) {
-        const particle = document.createElement("div");
-        particle.classList.add("heart");
-        particle.style.position = "absolute";
-        particle.style.left = x + "px";
-        particle.style.top = y + "px";
-        particle.style.width = (Math.random() * 25 + 15) + "px";
-        particle.style.height = (Math.random() * 25 + 15) + "px";
-        particle.style.opacity = 1;
-        
-        // Add heartbeat effect
-        particle.style.animation = "heartPulse 0.8s infinite";
-        
-        // Add 3D heart parts to the particle
-        const leftHalf = document.createElement("div");
-        leftHalf.classList.add("heart-half", "left");
-        
-        const rightHalf = document.createElement("div");
-        rightHalf.classList.add("heart-half", "right");
-        
-        // Randomly choose between skyblue and pink hearts
-        if (Math.random() > 0.5) {
-            particle.classList.add("pink");
-        }
-        
-        particle.appendChild(leftHalf);
-        particle.appendChild(rightHalf);
-        
-        document.body.appendChild(particle);
-        
-        // Random movement
-        const angle = Math.random() * Math.PI * 2;
-        const distance = Math.random() * 100 + 50;
-        const endX = x + Math.cos(angle) * distance;
-        const endY = y + Math.sin(angle) * distance;
-        
-        // Animate
-        const startTime = Date.now();
-        const duration = Math.random() * 1000 + 1000;
-        
-        function animateParticle() {
-            const elapsed = Date.now() - startTime;
-            const progress = elapsed / duration;
-            
-            if (progress >= 1) {
-                particle.remove();
-                return;
-            }
-            
-            const currentX = x + (endX - x) * progress;
-            const currentY = y + (endY - y) * progress - 50 * Math.sin(progress * Math.PI);
-            
-            particle.style.left = currentX + "px";
-            particle.style.top = currentY + "px";
-            particle.style.opacity = 1 - progress;
-            particle.style.transform = `scale(${1 - progress * 0.5})`;
-            
-            requestAnimationFrame(animateParticle);
-        }
-        
-        animateParticle();
-    }
-}
-
-if (typeof createButterfly !== 'function') {
-    function createButterfly(x, y) {
-        const butterfly = document.createElement("div");
-        butterfly.classList.add("butterfly");
-        
-        // Create wings
-        const leftWing = document.createElement("div");
-        leftWing.classList.add("butterfly-wing", "left");
-        
-        const rightWing = document.createElement("div");
-        rightWing.classList.add("butterfly-wing", "right");
-        
-        butterfly.appendChild(leftWing);
-        butterfly.appendChild(rightWing);
-        
-        // Random color
-        const hue = Math.random() * 60 + 300; // Pink to purple range
-        const color = `hsla(${hue}, 100%, 75%, 0.7)`;
-        leftWing.style.background = color;
-        rightWing.style.background = color;
-        
-        // Position and style
-        butterfly.style.left = x + "px";
-        butterfly.style.top = y + "px";
-        
-        document.body.appendChild(butterfly);
-        
-        // Animate butterfly
-        const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 2 + 1;
-        const startTime = Date.now();
-        
-        function animateButterfly() {
-            const elapsed = Date.now() - startTime;
-            const dx = Math.cos(angle) * speed;
-            const dy = Math.sin(angle) - elapsed / 2000; // Gradually float up
-            
-            const currentX = parseFloat(butterfly.style.left);
-            const currentY = parseFloat(butterfly.style.top);
-            
-            butterfly.style.left = (currentX + dx) + "px";
-            butterfly.style.top = (currentY + dy) + "px";
-            
-            // Remove if out of screen
-            if (currentY < -50 || currentX < -50 || currentX > window.innerWidth + 50) {
-                butterfly.remove();
-                return;
-            }
-            
-            requestAnimationFrame(animateButterfly);
-        }
-        
-        animateButterfly();
-        
-        // Remove after 10 seconds
-        setTimeout(() => {
-            butterfly.remove();
-        }, 10000);
-    }
-}
-
-if (typeof createHeartTrail !== 'function') {
-    function createHeartTrail(fromChar, toChar) {
-        const fromRect = fromChar.getBoundingClientRect();
-        const toRect = toChar.getBoundingClientRect();
-        
-        const startX = fromRect.left + fromRect.width / 2;
-        const startY = fromRect.top + fromRect.height / 3;
-        const endX = toRect.left + toRect.width / 2;
-        const endY = toRect.top + toRect.height / 3;
-        
-        // Create multiple hearts along the trail
-        const steps = 8;
-        for (let i = 0; i < steps; i++) {
-            setTimeout(() => {
-                const progress = i / (steps - 1);
-                const x = startX + (endX - startX) * progress;
-                const y = startY + (endY - startY) * progress - Math.sin(progress * Math.PI) * 50;
-                
-                const heart = document.createElement('div');
-                heart.classList.add('heart-trail');
-                heart.innerHTML = '❤️';
-                heart.style.left = x + 'px';
-                heart.style.top = y + 'px';
-                
-                document.body.appendChild(heart);
-                
-                // Remove after animation finishes
-                setTimeout(() => {
-                    heart.remove();
-                }, 2000);
-            }, i * 150);
-        }
-    }
-}
-
-if (typeof createFireworkEffect !== 'function') {
-    function createFireworkEffect() {
-        const centerX = window.innerWidth / 2;
-        const centerY = window.innerHeight / 2;
-        
-        // Create multiple explosions
-        for (let j = 0; j < 3; j++) {
-            setTimeout(() => {
-                const offsetX = (Math.random() - 0.5) * 300;
-                const offsetY = (Math.random() - 0.5) * 200;
-                
-                // Each explosion has multiple particles
-                for (let i = 0; i < 20; i++) {
-                    setTimeout(() => {
-                        const angle = (i / 20) * Math.PI * 2;
-                        const distance = 100 + Math.random() * 50;
-                        const explosionX = centerX + offsetX + Math.cos(angle) * distance;
-                        const explosionY = centerY + offsetY + Math.sin(angle) * distance;
-                        
-                        // Alternate between hearts and butterflies
-                        if (i % 2 === 0) {
-                            createHeartParticle(explosionX, explosionY);
-                        } else {
-                            createButterfly(explosionX, explosionY);
-                        }
-                    }, i * 30);
+        // Find the current lyric based on timestamp
+        for (let i = lyrics.length - 1; i >= 0; i--) {
+            if (currentTime >= lyrics[i].time) {
+                if (currentLyricIndex !== i) {
+                    currentLyricIndex = i;
+                    currentLyric.textContent = lyrics[i].text;
                 }
-            }, j * 800);
+                break;
+            }
         }
     }
+    
+    // Execute animation based on timeline
+    function executeTimelineActions() {
+        const currentTime = backgroundMusic.currentTime;
+        
+        // Check if we need to execute the next action
+        while (currentTimelineIndex < animationTimeline.length && 
+               currentTime >= animationTimeline[currentTimelineIndex].time) {
+            
+            // Get the current action
+            const action = animationTimeline[currentTimelineIndex].action;
+            
+            // Execute the action
+            executeAction(action);
+            
+            // Move to the next timeline index
+            currentTimelineIndex++;
+        }
+    }
+    
+    // Execute a specific animation action
+    function executeAction(action) {
+        console.log('Executing action:', action);
+        
+        switch (action) {
+            case 'start':
+                // Initial setup
+                break;
+                
+            case 'amineEnter':
+                walkCharacter(amine, 'right', 150, 3);
+                break;
+                
+            case 'douaeEnter':
+                walkCharacter(douae, 'left', 150, 3);
+                break;
+                
+            case 'amineWave':
+                waveCharacter(amine, 2);
+                break;
+                
+            case 'douaeWave':
+                waveCharacter(douae, 2);
+                break;
+                
+            case 'amineDance':
+                danceCharacter(amine, 4);
+                break;
+                
+            case 'douaeDance':
+                danceCharacter(douae, 4);
+                break;
+                
+            case 'meet':
+                meetCharacters(amine, douae, 3);
+                break;
+                
+            case 'hearts':
+                // Create multiple hearts around the characters
+                for (let i = 0; i < 10; i++) {
+                    setTimeout(() => {
+                        const x = Math.random() * 200 + (window.innerWidth / 2 - 100);
+                        const y = Math.random() * 100 + (window.innerHeight - 250);
+                        createHeartTrail(x, y, 3);
+                    }, i * 300);
+                }
+                break;
+                
+            case 'amineGiftFlower':
+                showGift(amine, 'flower', 4);
+                break;
+                
+            case 'amineGiftHeart':
+                showGift(amine, 'heart', 4);
+                break;
+                
+            case 'amineGiftBox':
+                showGift(amine, 'gift-box', 4);
+                break;
+                
+            case 'douaeReactionLove':
+                showReaction(douae, 'love', 4);
+                break;
+                
+            case 'douaeReactionSurprise':
+                showReaction(douae, 'surprise', 4);
+                break;
+                
+            case 'douaeReactionHappy':
+                showReaction(douae, 'happy', 4);
+                break;
+                
+            case 'bothJump':
+                jumpCharacter(amine, 30, 0.6);
+                jumpCharacter(douae, 30, 0.6);
+                break;
+                
+            case 'bothSpin':
+                spinCharacter(amine, 1);
+                spinCharacter(douae, 1);
+                break;
+                
+            case 'bothDance':
+                danceCharacter(amine, 8);
+                danceCharacter(douae, 8);
+                break;
+                
+            case 'moveAround':
+                // Characters move around each other
+                moveCharactersAround();
+                break;
+                
+            case 'kiss':
+                performKissAnimation();
+                break;
+                
+            case 'finale':
+                performFinaleAnimation();
+                break;
+                
+            case 'end':
+                // End animation sequence
+                resetCharactersPosition();
+                break;
+        }
+    }
+    
+    // Start updates based on music time
+    let updateInterval = setInterval(() => {
+        if (!backgroundMusic.paused) {
+            updateLyrics();
+            executeTimelineActions();
+            
+            // If music ended, clear interval
+            if (backgroundMusic.ended) {
+                clearInterval(updateInterval);
+                resetCharactersPosition();
+            }
+        }
+    }, 100);
+    
+    // Add event listener for when music ends
+    backgroundMusic.addEventListener('ended', function() {
+        clearInterval(updateInterval);
+        resetCharactersPosition();
+    });
 }
 
-if (typeof createGrandFinale !== 'function') {
-    function createGrandFinale() {
-        // Create heart shower
-        for (let i = 0; i < 50; i++) {
-            setTimeout(() => {
-                const x = Math.random() * window.innerWidth;
-                const y = -20; // Start from top
-                createHeartParticle(x, y);
-            }, i * 100);
-        }
-        
-        // Create butterfly storm
-        for (let i = 0; i < 20; i++) {
-            setTimeout(() => {
-                const x = Math.random() * window.innerWidth;
-                const y = Math.random() * window.innerHeight;
-                createButterfly(x, y);
-            }, i * 150 + 500);
-        }
-        
-        // Create radial heart burst
-        setTimeout(() => {
-            const centerX = window.innerWidth / 2;
-            const centerY = window.innerHeight / 2;
-            
-            for (let i = 0; i < 36; i++) {
-                setTimeout(() => {
-                    const angle = (i / 36) * Math.PI * 2;
-                    const distance = 150;
-                    const x = centerX + Math.cos(angle) * distance;
-                    const y = centerY + Math.sin(angle) * distance;
-                    
-                    createHeartParticle(x, y);
-                }, i * 50);
-            }
-        }, 2000);
-    }
+// Reset characters to starting position
+function resetCharactersPosition() {
+    const amine = document.getElementById('amine');
+    const douae = document.getElementById('douae');
+    
+    amine.style.transition = 'left 0.5s ease-in-out';
+    douae.style.transition = 'right 0.5s ease-in-out';
+    amine.style.left = '-150px';
+    douae.style.right = '-150px';
+    
+    // Remove any animations
+    amine.classList.remove('walking', 'jumping', 'dancing', 'spinning', 'happy-meeting', 'paused');
+    douae.classList.remove('walking', 'jumping', 'dancing', 'spinning', 'happy-meeting', 'paused');
+    
+    // Hide gifts and reactions
+    document.querySelectorAll('.gift, .reaction').forEach(element => {
+        element.classList.remove('visible', 'floating');
+        element.classList.add('hidden');
+    });
 }
