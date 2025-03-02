@@ -1,391 +1,361 @@
-// finale-animation.js - Grand finale for the 3:31 animation sequence
-document.addEventListener('DOMContentLoaded', function() {
-    // Character elements
-    const amineChar = document.getElementById('amine');
-    const douaeChar = document.getElementById('douae');
-    const backgroundMusic = document.getElementById('backgroundMusic');
+// finale-animation.js - Grand finale animation sequence
+
+function performFinaleAnimation() {
+    const amine = document.getElementById('amine');
+    const douae = document.getElementById('douae');
+    const container = document.body;
     
-    // Track animation state
-    let finaleStarted = false;
+    // Stop any current animations
+    amine.classList.remove('walking', 'jumping', 'dancing', 'spinning');
+    douae.classList.remove('walking', 'jumping', 'dancing', 'spinning');
     
-    // Listen for music time to trigger finale
-    if (backgroundMusic) {
-        backgroundMusic.addEventListener('timeupdate', function() {
-            // Trigger finale at around 3:10 (190 seconds)
-            if (backgroundMusic.currentTime >= 190 && !finaleStarted) {
-                finaleStarted = true;
-                grandFinale();
-            }
-        });
-    }
+    // Position characters in the center
+    amine.style.transition = 'left 1s ease-in-out';
+    douae.style.transition = 'right 1s ease-in-out';
     
-    // Mario-style grand finale
-    function grandFinale() {
-        console.log("Starting grand finale!");
-        
-        // Create castle/flag in Super Mario style
-        createMarioCastle();
-        
-        // Move characters to starting positions
-        moveCharacterToPosition(amineChar, '10%');
-        moveCharacterToPosition(douaeChar, '90%');
-        
-        // Characters run toward castle
-        setTimeout(() => {
-            runTowardsCastle();
-        }, 2000);
-    }
-    
-    // Create Mario-style castle and flag
-    function createMarioCastle() {
-        // Container for castle elements
-        const castle = document.createElement('div');
-        castle.id = 'mario-castle';
-        castle.style.position = 'absolute';
-        castle.style.bottom = '0';
-        castle.style.left = '50%';
-        castle.style.transform = 'translateX(-50%)';
-        castle.style.width = '200px';
-        castle.style.height = '200px';
-        castle.style.zIndex = '80';
-        document.body.appendChild(castle);
-        
-        // Castle base
-        const castleBase = document.createElement('div');
-        castleBase.style.position = 'absolute';
-        castleBase.style.bottom = '0';
-        castleBase.style.left = '0';
-        castleBase.style.width = '100%';
-        castleBase.style.height = '120px';
-        castleBase.style.backgroundColor = '#8B4513';
-        castleBase.style.borderTop = '10px solid #A0522D';
-        castle.appendChild(castleBase);
-        
-        // Castle towers
-        for (let i = 0; i < 3; i++) {
-            const tower = document.createElement('div');
-            tower.style.position = 'absolute';
-            tower.style.bottom = '120px';
-            tower.style.width = '40px';
-            tower.style.height = '60px';
-            tower.style.backgroundColor = '#8B4513';
-            tower.style.borderTopLeftRadius = '20px';
-            tower.style.borderTopRightRadius = '20px';
-            
-            // Position towers
-            if (i === 0) {
-                tower.style.left = '20px';
-            } else if (i === 1) {
-                tower.style.left = '80px';
-                tower.style.height = '80px'; // Middle tower taller
-            } else {
-                tower.style.left = '140px';
-            }
-            
-            castle.appendChild(tower);
-        }
-        
-        // Flagpole
-        const flagpole = document.createElement('div');
-        flagpole.style.position = 'absolute';
-        flagpole.style.bottom = '0';
-        flagpole.style.left = '-80px';
-        flagpole.style.width = '10px';
-        flagpole.style.height = '180px';
-        flagpole.style.backgroundColor = 'silver';
-        castle.appendChild(flagpole);
-        
-        // Flag
-        const flag = document.createElement('div');
-        flag.style.position = 'absolute';
-        flag.style.bottom = '100px';
-        flag.style.left = '-70px';
-        flag.style.width = '0';
-        flag.style.height = '0';
-        flag.style.borderStyle = 'solid';
-        flag.style.borderWidth = '20px 40px 20px 0';
-        flag.style.borderColor = 'transparent red transparent transparent';
-        flag.style.transition = 'bottom 3s ease-in-out';
-        castle.appendChild(flag);
-        
-        // Castle door
-        const door = document.createElement('div');
-        door.style.position = 'absolute';
-        door.style.bottom = '0';
-        door.style.left = '70px';
-        door.style.width = '60px';
-        door.style.height = '80px';
-        door.style.backgroundColor = 'black';
-        door.style.borderTopLeftRadius = '30px';
-        door.style.borderTopRightRadius = '30px';
-        castle.appendChild(door);
-        
-        // Animate flag raising at the end
-        setTimeout(() => {
-            flag.style.bottom = '160px';
-        }, 15000);
-        
-        return castle;
-    }
-    
-    // Move character to specific position
-    function moveCharacterToPosition(character, position) {
-        // Clear any existing animation classes
-        character.classList.remove('walking', 'running', 'jumping');
-        
-        // Position is a percentage string (e.g., '10%')
-        if (character.id === 'amine') {
-            character.style.left = position;
-            character.style.right = 'auto';
-        } else {
-            character.style.right = position;
-            character.style.left = 'auto';
-        }
-    }
-    
-    // Make characters run towards the castle
-    function runTowardsCastle() {
-        // Add running animation
-        if (!document.getElementById('marioRunStyle')) {
-            const runStyle = document.createElement('style');
-            runStyle.id = 'marioRunStyle';
-            runStyle.textContent = `
-                @keyframes marioRun {
-                    0% { transform: translateY(0) scale(1); }
-                    25% { transform: translateY(-15px) scale(1); }
-                    50% { transform: translateY(0) scale(1); }
-                    75% { transform: translateY(-15px) scale(1); }
-                    100% { transform: translateY(0) scale(1); }
-                }
-                
-                .mario-running img {
-                    animation: marioRun 0.5s infinite;
-                }
-            `;
-            document.head.appendChild(runStyle);
-        }
-        
-        // Add running class to both characters
-        amineChar.classList.add('mario-running');
-        douaeChar.classList.add('mario-running');
-        
-        // Animate Amine running to castle
-        const amineInterval = setInterval(() => {
-            const currentLeft = parseFloat(amineChar.style.left) || 0;
-            const targetLeft = 35; // Percentage
-            
-            if (currentLeft < targetLeft) {
-                amineChar.style.left = (currentLeft + 1) + '%';
-            } else {
-                clearInterval(amineInterval);
-                
-                // Mario-style jump after reaching position
-                setTimeout(() => {
-                    marioJump(amineChar);
-                }, 500);
-            }
-        }, 50);
-        
-        // Animate Douae running to castle
-        const douaeInterval = setInterval(() => {
-            const currentRight = parseFloat(douaeChar.style.right) || 0;
-            const targetRight = 35; // Percentage
-            
-            if (currentRight < targetRight) {
-                douaeChar.style.right = (currentRight + 1) + '%';
-            } else {
-                clearInterval(douaeInterval);
-                
-                // Mario-style jump after reaching position
-                setTimeout(() => {
-                    marioJump(douaeChar);
-                }, 1000);
-                
-                // Start flag raising animation after characters reach castle
-                setTimeout(() => {
-                    flagComplete();
-                }, 3000);
-            }
-        }, 50);
-    }
-    
-    // Mario-style jump animation
-    function marioJump(character) {
-        // Remove running animation
-        character.classList.remove('mario-running');
-        
-        // Play jump sound
-        const jumpSound = new Audio('jump.mp3');
-        if (jumpSound) {
-            jumpSound.play().catch(e => {
-                console.log('Sound play prevented by browser policy');
-            });
-        }
-        
-        // Add jump animation
-        character.animate([
-            { transform: 'translateY(0) scale(1)' },
-            { transform: 'translateY(-80px) scale(1.1)' },
-            { transform: 'translateY(0) scale(1)' }
-        ], {
-            duration: 800,
-            easing: 'cubic-bezier(0.7, 0, 0.3, 1)' // Mario-like jump physics
-        });
-    }
-    
-    // Final animation when flag is raised
-    function flagComplete() {
-        // Play course clear sound
-        const clearSound = new Audio('clear.mp3');
-        if (clearSound) {
-            clearSound.play().catch(e => {
-                console.log('Sound play prevented by browser policy');
-            });
-        }
-        
-        // Fireworks effect
-        createFireworks();
-        
-        // Create "LOVE COMPLETE!" banner
-        const banner = document.createElement('div');
-        banner.textContent = 'LOVE COMPLETE!';
-        banner.style.position = 'fixed';
-        banner.style.top = '40%';
-        banner.style.left = '50%';
-        banner.style.transform = 'translate(-50%, -50%)';
-        banner.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-        banner.style.color = 'gold';
-        banner.style.padding = '15px 30px';
-        banner.style.fontSize = '36px';
-        banner.style.fontWeight = 'bold';
-        banner.style.fontFamily = "'Press Start 2P', monospace";
-        banner.style.borderRadius = '10px';
-        banner.style.zIndex = '200';
-        banner.style.boxShadow = '0 0 20px rgba(255, 215, 0, 0.5)';
-        document.body.appendChild(banner);
-        
-        // Animate banner
-        banner.animate([
-            { transform: 'translate(-50%, -300%)', opacity: 0 },
-            { transform: 'translate(-50%, -50%)', opacity: 1 }
-        ], {
-            duration: 1000,
-            easing: 'cubic-bezier(0.2, 0.7, 0.3, 1)'
-        });
-        
-        // Final heart explosion
-        setTimeout(() => {
-            // Create hearts everywhere
-            for (let i = 0; i < 30; i++) {
-                setTimeout(() => {
-                    const heart = document.createElement('div');
-                    heart.innerHTML = '❤️';
-                    heart.style.position = 'absolute';
-                    heart.style.fontSize = (Math.random() * 20 + 20) + 'px';
-                    heart.style.left = (Math.random() * 100) + '%';
-                    heart.style.top = (Math.random() * 100) + '%';
-                    heart.style.zIndex = '150';
-                    document.body.appendChild(heart);
-                    
-                    // Animate heart
-                    heart.animate([
-                        { transform: 'scale(0) rotate(0deg)', opacity: 0 },
-                        { transform: 'scale(1.5) rotate(360deg)', opacity: 1 },
-                        { transform: 'scale(1) rotate(720deg)', opacity: 0 }
-                    ], {
-                        duration: 2000,
-                        easing: 'ease-out'
-                    });
-                    
-                    // Remove heart after animation
-                    setTimeout(() => {
-                        heart.remove();
-                    }, 2000);
-                }, i * 100);
-            }
-            
-            // Final message
-            setTimeout(() => {
-                banner.textContent = 'I ❤️ YOU DOUAE!';
-                
-                banner.animate([
-                    { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
-                    { transform: 'translate(-50%, -50%) scale(1.2)', opacity: 1 },
-                    { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 }
-                ], {
-                    duration: 1000,
-                    easing: 'ease-in-out'
-                });
-            }, 3000);
-        }, 2000);
-    }
+    amine.style.left = 'calc(50% - 100px)';
+    douae.style.right = 'calc(50% - 100px)';
     
     // Create fireworks effect
-    function createFireworks() {
-        for (let i = 0; i < 15; i++) {
-            setTimeout(() => {
-                const firework = document.createElement('div');
-                firework.style.position = 'absolute';
-                firework.style.left = (Math.random() * 80 + 10) + '%';
-                firework.style.top = (Math.random() * 60 + 10) + '%';
-                firework.style.width = '10px';
-                firework.style.height = '10px';
-                firework.style.borderRadius = '50%';
-                firework.style.zIndex = '190';
-                
-                // Random firework color
-                const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
-                const color = colors[Math.floor(Math.random() * colors.length)];
-                firework.style.backgroundColor = color;
-                firework.style.boxShadow = `0 0 20px ${color}`;
-                
-                document.body.appendChild(firework);
-                
-                // Explode firework
-                setTimeout(() => {
-                    // Create explosion particles
-                    for (let j = 0; j < 20; j++) {
-                        const particle = document.createElement('div');
-                        particle.style.position = 'absolute';
-                        particle.style.left = firework.style.left;
-                        particle.style.top = firework.style.top;
-                        particle.style.width = '3px';
-                        particle.style.height = '3px';
-                        particle.style.borderRadius = '50%';
-                        particle.style.backgroundColor = color;
-                        particle.style.zIndex = '191';
-                        document.body.appendChild(particle);
-                        
-                        // Calculate random direction for particle
-                        const angle = Math.random() * Math.PI * 2;
-                        const distance = Math.random() * 100 + 50;
-                        const x = Math.cos(angle) * distance;
-                        const y = Math.sin(angle) * distance;
-                        
-                        // Animate particle
-                        particle.animate([
-                            { transform: 'translate(0, 0)', opacity: 1 },
-                            { transform: `translate(${x}px, ${y}px)`, opacity: 0 }
-                        ], {
-                            duration: 1000,
-                            easing: 'cubic-bezier(0.2, 0.9, 0.3, 1)'
-                        });
-                        
-                        // Remove particle after animation
-                        setTimeout(() => {
-                            particle.remove();
-                        }, 1000);
-                    }
-                    
-                    // Remove firework center
-                    firework.remove();
-                }, 500);
-            }, i * 500);
+    createFireworks();
+    
+    // Create glowing text
+    createGlowingText();
+    
+    // Make characters jump together
+    setTimeout(() => {
+        jumpCharacter(amine, 40, 1);
+        jumpCharacter(douae, 40, 1);
+        
+        // Show reactions
+        showReaction(douae, 'love', 4);
+        
+        // Create heart shape between them
+        setTimeout(() => {
+            createHeartBetween();
+        }, 500);
+    }, 1000);
+    
+    // Spin characters
+    setTimeout(() => {
+        spinCharacter(amine, 1.5);
+        spinCharacter(douae, 1.5);
+    }, 3000);
+    
+    // Make them dance together
+    setTimeout(() => {
+        danceTogether();
+    }, 5000);
+    
+    // Create a rain of hearts
+    setTimeout(() => {
+        createHeartRain();
+    }, 7000);
+}
+
+// Create fireworks effect
+function createFireworks() {
+    const container = document.body;
+    const fireworkCount = 10;
+    
+    // Create style for fireworks
+    const style = document.createElement('style');
+    style.textContent = `
+        .firework {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 80;
         }
+        
+        .firework-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            pointer-events: none;
+            background-color: white;
+            transform-origin: center;
+        }
+        
+        @keyframes firework-rise {
+            0% { transform: translateY(100vh); }
+            100% { transform: translateY(20vh); }
+        }
+        
+        @keyframes firework-explode {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(20); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Create fireworks
+    for (let i = 0; i < fireworkCount; i++) {
+        setTimeout(() => {
+            // Create firework
+            const firework = document.createElement('div');
+            firework.classList.add('firework');
+            
+            // Random position
+            const x = Math.random() * window.innerWidth;
+            firework.style.left = `${x}px`;
+            firework.style.bottom = '0';
+            
+            // Random color
+            const hue = Math.random() * 360;
+            firework.style.backgroundColor = `hsl(${hue}, 100%, 60%)`;
+            firework.style.boxShadow = `0 0 6px 2px hsl(${hue}, 100%, 60%)`;
+            
+            // Animate rising
+            firework.style.animation = `firework-rise ${Math.random() * 2 + 1}s forwards`;
+            
+            container.appendChild(firework);
+            
+            // Explode after rising
+            setTimeout(() => {
+                // Get final position
+                const rect = firework.getBoundingClientRect();
+                const finalX = rect.left + rect.width / 2;
+                const finalY = rect.top + rect.height / 2;
+                
+                // Remove firework
+                firework.remove();
+                
+                // Create explosion particles
+                createExplosion(finalX, finalY, hue);
+            }, Math.random() * 2000 + 1000);
+        }, i * 500);
     }
     
-    // Expose functions for use by other scripts
-    window.finaleAnimations = {
-        startFinale: grandFinale,
-        createFireworks: createFireworks
-    };
+    // Remove style after animations
+    setTimeout(() => {
+        style.remove();
+    }, 15000);
+}
+
+// Create firework explosion
+function createExplosion(x, y, hue) {
+    const container = document.body;
+    const particleCount = 30;
+    
+    // Create circular flash
+    const flash = document.createElement('div');
+    flash.style.position = 'absolute';
+    flash.style.left = `${x}px`;
+    flash.style.top = `${y}px`;
+    flash.style.width = '10px';
+    flash.style.height = '10px';
+    flash.style.borderRadius = '50%';
+    flash.style.backgroundColor = `hsl(${hue}, 100%, 75%)`;
+    flash.style.zIndex = '85';
+    flash.style.transform = 'translate(-50%, -50%)';
+    flash.style.animation = 'firework-explode 0.5s forwards';
+    
+    container.appendChild(flash);
+    
+    // Remove flash after animation
+    setTimeout(() => {
+        flash.remove();
+    }, 500);
+    
+    // Create particles
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('firework-particle');
+        
+        // Set position
+        particle.style.left = `${x}px`;
+        particle.style.top = `${y}px`;
+        
+        // Random color variation
+        const colorVariation = Math.random() * 30 - 15;
+        particle.style.backgroundColor = `hsl(${hue + colorVariation}, 100%, 70%)`;
+        particle.style.boxShadow = `0 0 4px 1px hsl(${hue + colorVariation}, 100%, 70%)`;
+        
+        // Random direction and speed
+        const angle = Math.random() * Math.PI * 2;
+        const distance = Math.random() * 100 + 50;
+        const duration = Math.random() * 1 + 1;
+        
+        // Animate particle
+        particle.style.animation = 'none';
+        particle.style.transition = `all ${duration}s ease-out`;
+        
+        container.appendChild(particle);
+        
+        // Start animation after a small delay
+        setTimeout(() => {
+            particle.style.left = `${x + Math.cos(angle) * distance}px`;
+            particle.style.top = `${y + Math.sin(angle) * distance}px`;
+            particle.style.opacity = '0';
+            
+            // Remove particle after animation
+            setTimeout(() => {
+                particle.remove();
+            }, duration * 1000);
+        }, 10);
+    }
+}
+
+// Create glowing text effect
+function createGlowingText() {
+    const container = document.querySelector('.container');
+    const h1 = container.querySelector('h1');
+    const message = container.querySelector('.message');
+    
+    // Add glowing effect to heading
+    h1.style.transition = 'text-shadow 0.5s ease-in-out';
+    h1.style.textShadow = '0 0 20px rgba(255, 105, 180, 0.8), 0 0 30px rgba(255, 105, 180, 0.6)';
+    
+    // Pulse animation for heading
+    let pulseInterval = setInterval(() => {
+        if (h1.style.textShadow.includes('30px')) {
+            h1.style.textShadow = '0 0 10px rgba(255, 105, 180, 0.8), 0 0 15px rgba(255, 105, 180, 0.6)';
+        } else {
+            h1.style.textShadow = '0 0 20px rgba(255, 105, 180, 0.8), 0 0 30px rgba(255, 105, 180, 0.6)';
+        }
+    }, 1000);
+    
+    // Add glow to message
+    message.style.transition = 'text-shadow 0.5s ease-in-out';
+    message.style.textShadow = '0 0 10px rgba(255, 255, 255, 0.8)';
+    
+    // Stop animation after some time
+    setTimeout(() => {
+        clearInterval(pulseInterval);
+    }, 15000);
+}
+
+// Heart rain effect
+function createHeartRain() {
+    const container = document.body;
+    const heartCount = 40;
+    
+    // Create style for falling hearts
+    const style = document.createElement('style');
+    style.textContent = `
+        .falling-heart {
+            position: absolute;
+            font-size: 24px;
+            pointer-events: none;
+            z-index: 50;
+            animation: heart-fall linear forwards;
+        }
+        
+        @keyframes heart-fall {
+            0% { 
+                transform: translateY(-50px) rotate(0deg); 
+                opacity: 1;
+            }
+            90% { opacity: 1; }
+            100% { 
+                transform: translateY(110vh) rotate(360deg); 
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Heart emojis with variations
+    const heartEmojis = ['❤️', '💕', '💖', '💓', '💗', '💘'];
+    
+    // Create falling hearts
+    for (let i = 0; i < heartCount; i++) {
+        setTimeout(() => {
+            const heart = document.createElement('div');
+            heart.classList.add('falling-heart');
+            heart.innerHTML = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+            
+            // Random position
+            heart.style.left = `${Math.random() * 100}vw`;
+            
+            // Random size
+            heart.style.fontSize = `${Math.random() * 20 + 15}px`;
+            
+            // Random fall duration
+            const duration = Math.random() * 5 + 5;
+            heart.style.animationDuration = `${duration}s`;
+            
+            container.appendChild(heart);
+            
+            // Remove after animation
+            setTimeout(() => {
+                heart.remove();
+            }, duration * 1000);
+        }, i * 200);
+    }
+    
+    // Remove style after all hearts are gone
+    setTimeout(() => {
+        style.remove();
+    }, heartCount * 200 + 10000);
+}
+
+// Create a special message that appears at the finale
+function createSpecialMessage() {
+    const container = document.body;
+    
+    // Create message container
+    const messageContainer = document.createElement('div');
+    messageContainer.style.position = 'fixed';
+    messageContainer.style.top = '50%';
+    messageContainer.style.left = '50%';
+    messageContainer.style.transform = 'translate(-50%, -50%) scale(0)';
+    messageContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+    messageContainer.style.borderRadius = '20px';
+    messageContainer.style.padding = '30px';
+    messageContainer.style.boxShadow = '0 0 30px rgba(255, 105, 180, 0.8)';
+    messageContainer.style.zIndex = '200';
+    messageContainer.style.transition = 'transform 1s ease-in-out';
+    
+    // Create message text
+    const message = document.createElement('div');
+    message.style.color = 'white';
+    message.style.fontSize = '32px';
+    message.style.textAlign = 'center';
+    message.style.fontWeight = 'bold';
+    message.style.textShadow = '0 0 10px rgba(255, 255, 255, 0.5)';
+    message.textContent = 'Forever in Love';
+    
+    // Create close button
+    const closeButton = document.createElement('div');
+    closeButton.style.color = 'white';
+    closeButton.style.fontSize = '16px';
+    closeButton.style.textAlign = 'center';
+    closeButton.style.marginTop = '20px';
+    closeButton.style.cursor = 'pointer';
+    closeButton.textContent = 'Close';
+    
+    // Add to container
+    messageContainer.appendChild(message);
+    messageContainer.appendChild(closeButton);
+    container.appendChild(messageContainer);
+    
+    // Show message
+    setTimeout(() => {
+        messageContainer.style.transform = 'translate(-50%, -50%) scale(1)';
+    }, 100);
+    
+    // Close button event
+    closeButton.addEventListener('click', () => {
+        messageContainer.style.transform = 'translate(-50%, -50%) scale(0)';
+        
+        // Remove after animation
+        setTimeout(() => {
+            messageContainer.remove();
+        }, 1000);
+    });
+    
+    // Auto close after some time
+    setTimeout(() => {
+        messageContainer.style.transform = 'translate(-50%, -50%) scale(0)';
+        
+        // Remove after animation
+        setTimeout(() => {
+            messageContainer.remove();
+        }, 1000);
+    }, 8000);
+}
