@@ -345,11 +345,151 @@
             cursor: pointer;
             z-index: 101;
         }
+        
+        /* Character animations */
+        .characters-container {
+            position: fixed;
+            bottom: 10%;
+            width: 100%;
+            height: 180px; /* Increased from 150px */
+            z-index: 20;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .character {
+            position: absolute;
+            bottom: 0;
+            transform-origin: bottom center;
+        }
+        
+        .character img {
+            height: 150px; /* Increased from 120px - bigger than Mario */
+            width: auto;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.3));
+            transform-origin: bottom center;
+        }
+        
+        .amine {
+            left: -150px; /* Start off-screen, adjusted for larger size */
+            z-index: 21;
+        }
+        
+        .douae {
+            right: -150px; /* Start off-screen, adjusted for larger size */
+            z-index: 20;
+        }
+        
+        /* Walking animation */
+        @keyframes walk {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-8px) rotate(2deg); }
+            75% { transform: translateY(-8px) rotate(-2deg); }
+        }
+        
+        .walking img {
+            animation: walk 0.8s infinite;
+        }
+        
+        /* Jumping animation */
+        @keyframes jump {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-30px) scale(1.1); }
+        }
+        
+        .jumping img {
+            animation: jump 0.6s ease-in-out;
+        }
+        
+        /* Gifts and reactions */
+        .gift, .reaction {
+            position: absolute;
+            font-size: 32px; /* Larger emoji size */
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.7));
+            transition: all 0.3s ease-out;
+            opacity: 0;
+            transform-origin: bottom center;
+        }
+        
+        .gift.visible, .reaction.visible {
+            animation: popUp 0.5s forwards;
+        }
+        
+        .gift.hidden, .reaction.hidden {
+            opacity: 0;
+            transform: translateX(-50%) scale(0);
+        }
+        
+        @keyframes popUp {
+            0% { opacity: 0; transform: translateX(-50%) scale(0); }
+            70% { opacity: 1; transform: translateX(-50%) scale(1.2); }
+            100% { opacity: 1; transform: translateX(-50%) scale(1); }
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) translateX(-50%); }
+            50% { transform: translateY(-15px) translateX(-50%); }
+            100% { transform: translateY(0) translateX(-50%); }
+        }
+        
+        .gift.floating, .reaction.floating {
+            animation: float 1.5s infinite ease-in-out;
+        }
+        
+        /* Heart trail */
+        .heart-trail {
+            position: absolute;
+            font-size: 24px; /* Larger heart size */
+            z-index: 19;
+            animation: trailFloat 2s forwards;
+            opacity: 0.8;
+        }
+        
+        @keyframes trailFloat {
+            0% { opacity: 0.8; transform: translateY(0) scale(0.8); }
+            100% { opacity: 0; transform: translateY(-50px) scale(0.3); }
+        }
+        
+        /* Meeting animation */
+        @keyframes happy-bounce {
+            0%, 100% { transform: scale(1); }
+            30% { transform: scale(1.15); }
+            60% { transform: scale(0.9); }
+            80% { transform: scale(1.05); }
+        }
+        
+        .happy-meeting {
+            animation: happy-bounce 0.6s;
+        }
+        
+        /* Pause animation to show reaction */
+        .paused img {
+            animation-play-state: paused;
+        }
     </style>
 </head>
 <body>
     <div class="stars" id="stars"></div>
     <div class="flowers" id="flowers"></div>
+    
+    <!-- Character container - add right after flowers div -->
+    <div class="characters-container" id="charactersContainer">
+        <div class="character amine" id="amine">
+            <img src="./Amine.png" alt="Amine Character">
+            <div class="gift flower hidden">🌹</div>
+            <div class="gift heart hidden">❤️</div>
+            <div class="gift gift-box hidden">🎁</div>
+        </div>
+        <div class="character douae" id="douae">
+            <img src="./Douae.png" alt="Douae Character">
+            <div class="reaction love hidden">😍</div>
+            <div class="reaction surprise hidden">😲</div>
+            <div class="reaction happy hidden">☺️</div>
+        </div>
+    </div>
     
     <div class="container">
         <h1>I Love You Douae</h1>
@@ -409,6 +549,242 @@
                     backgroundMusic.pause();
                 }
             });
+    </script>
+</body>
+</html>
+            
+            // Character Animation Functions for Amine and Douae
+            // Get character elements
+            const amineCharacter = document.getElementById('amine');
+            const douaeCharacter = document.getElementById('douae');
+            const charactersContainer = document.getElementById('charactersContainer');
+            
+            // Gift elements
+            const amineFlower = amineCharacter.querySelector('.flower');
+            const amineHeart = amineCharacter.querySelector('.heart');
+            const amineGiftBox = amineCharacter.querySelector('.gift-box');
+            
+            // Reaction elements
+            const douaeLove = douaeCharacter.querySelector('.love');
+            const douaeSurprise = douaeCharacter.querySelector('.surprise');
+            const douaeHappy = douaeCharacter.querySelector('.happy');
+            
+            // Animation timeline
+            let animationStarted = false;
+            let timeoutIds = [];
+            
+            // Start animation on page load (with a delay)
+            setTimeout(() => {
+                startCharacterAnimation();
+            }, 3000);
+            
+            // Function to create heart trail
+            function createHeartTrail(x, y) {
+                const heart = document.createElement('div');
+                heart.classList.add('heart-trail');
+                heart.innerHTML = '❤️';
+                heart.style.left = x + 'px';
+                heart.style.top = y + 'px';
+                charactersContainer.appendChild(heart);
+                
+                // Remove after animation completes
+                setTimeout(() => {
+                    heart.remove();
+                }, 2000);
+            }
+            
+            // Main animation sequence
+            function startCharacterAnimation() {
+                if (animationStarted) return;
+                animationStarted = true;
+                
+                // Reset positions
+                amineCharacter.style.left = '-150px';
+                douaeCharacter.style.right = '-150px';
+                
+                // 1. First, Douae enters from right
+                douaeCharacter.classList.add('walking');
+                
+                const containerWidth = charactersContainer.offsetWidth;
+                const douaeWidth = douaeCharacter.offsetWidth;
+                const douaeFinalPosition = containerWidth * 0.65 - douaeWidth;
+                
+                animatePosition(douaeCharacter, 'right', -150, containerWidth * 0.3, 3000, () => {
+                    douaeCharacter.classList.remove('walking');
+                    
+                    // 2. After a moment, Amine enters from left
+                    timeoutIds.push(setTimeout(() => {
+                        amineCharacter.classList.add('walking');
+                        
+                        // Animate Amine walking in
+                        animatePosition(amineCharacter, 'left', -150, containerWidth * 0.3, 3000, () => {
+                            
+                            // 3. Amine notices Douae and shows surprise
+                            amineCharacter.classList.add('paused');
+                            amineCharacter.classList.add('happy-meeting');
+                            
+                            // 4. Amine gives flower
+                            timeoutIds.push(setTimeout(() => {
+                                amineFlower.classList.remove('hidden');
+                                amineFlower.classList.add('visible', 'floating');
+                                
+                                // 5. Amine approaches Douae
+                                timeoutIds.push(setTimeout(() => {
+                                    amineCharacter.classList.remove('paused', 'happy-meeting');
+                                    amineCharacter.classList.add('walking');
+                                    
+                                    // Walk closer to Douae
+                                    animatePosition(amineCharacter, 'left', containerWidth * 0.3, containerWidth * 0.45, 2000, () => {
+                                        amineCharacter.classList.remove('walking');
+                                        
+                                        // 6. Douae shows surprise
+                                        douaeSurprise.classList.remove('hidden');
+                                        douaeSurprise.classList.add('visible');
+                                        
+                                        // 7. Douae walks toward Amine
+                                        timeoutIds.push(setTimeout(() => {
+                                            douaeSurprise.classList.remove('visible');
+                                            douaeSurprise.classList.add('hidden');
+                                            
+                                            douaeCharacter.classList.add('walking');
+                                            animatePosition(douaeCharacter, 'right', containerWidth * 0.3, containerWidth * 0.4, 1500, () => {
+                                                douaeCharacter.classList.remove('walking');
+                                                
+                                                // 8. Amine offers the flower, hide the floating one
+                                                amineFlower.classList.remove('floating', 'visible');
+                                                amineFlower.classList.add('hidden');
+                                                
+                                                // 9. Show love reaction from Douae
+                                                douaeLove.classList.remove('hidden');
+                                                douaeLove.classList.add('visible', 'floating');
+                                                
+                                                // 10. Create heart effects around them
+                                                const heartsInterval = setInterval(() => {
+                                                    const amineRect = amineCharacter.getBoundingClientRect();
+                                                    const douaeRect = douaeCharacter.getBoundingClientRect();
+                                                    
+                                                    // Random position between characters
+                                                    const randomX = Math.random() * (douaeRect.right - amineRect.left) + amineRect.left - charactersContainer.getBoundingClientRect().left;
+                                                    const randomY = amineRect.top - Math.random() * 50 - charactersContainer.getBoundingClientRect().top;
+                                                    
+                                                    createHeartTrail(randomX, randomY);
+                                                }, 300);
+                                                
+                                                timeoutIds.push(setTimeout(() => {
+                                                    // 11. Amine gives gift box
+                                                    amineGiftBox.classList.remove('hidden');
+                                                    amineGiftBox.classList.add('visible', 'floating');
+                                                    
+                                                    // 12. Both jump with happiness
+                                                    timeoutIds.push(setTimeout(() => {
+                                                        amineCharacter.classList.add('jumping');
+                                                        douaeCharacter.classList.add('jumping');
+                                                        
+                                                        // 13. After jumping, walk together to center
+                                                        timeoutIds.push(setTimeout(() => {
+                                                            // Clear heart interval
+                                                            clearInterval(heartsInterval);
+                                                            
+                                                            // Move to center together
+                                                            amineCharacter.classList.add('walking');
+                                                            douaeCharacter.classList.add('walking');
+                                                            
+                                                            // Hide gifts and reactions for walking
+                                                            amineGiftBox.classList.remove('visible', 'floating');
+                                                            amineGiftBox.classList.add('hidden');
+                                                            douaeLove.classList.remove('visible', 'floating');
+                                                            douaeLove.classList.add('hidden');
+                                                            
+                                                            const centerPosition = containerWidth / 2;
+                                                            
+                                                            animatePosition(amineCharacter, 'left', containerWidth * 0.45, centerPosition - 70, 2000);
+                                                            animatePosition(douaeCharacter, 'right', containerWidth * 0.4, centerPosition - 50, 2000, () => {
+                                                                // 14. Show heart between them at center
+                                                                amineHeart.classList.remove('hidden');
+                                                                amineHeart.classList.add('visible', 'floating');
+                                                                
+                                                                douaeHappy.classList.remove('hidden');
+                                                                douaeHappy.classList.add('visible', 'floating');
+                                                                
+                                                                amineCharacter.classList.remove('walking');
+                                                                douaeCharacter.classList.remove('walking');
+                                                                
+                                                                // 15. After a while, restart animation
+                                                                timeoutIds.push(setTimeout(() => {
+                                                                    resetAnimation();
+                                                                }, 8000));
+                                                            });
+                                                        }, 1000));
+                                                    }, 1000));
+                                                }, 3000));
+                                            });
+                                        }, 1500));
+                                    });
+                                }, 1500));
+                            }, 1000));
+                        });
+                    }, 1500));
+                });
+            }
+            
+            // Helper function to animate position
+            function animatePosition(element, property, start, end, duration, callback) {
+                const startTime = performance.now();
+                element.style[property] = start + 'px';
+                
+                function step(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    
+                    // Easing function - ease-in-out
+                    const easeProgress = progress < 0.5 ? 
+                        2 * progress * progress : 
+                        1 - Math.pow(-2 * progress + 2, 2) / 2;
+                    
+                    const currentPosition = start + (end - start) * easeProgress;
+                    element.style[property] = currentPosition + 'px';
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(step);
+                    } else if (callback) {
+                        callback();
+                    }
+                }
+                
+                requestAnimationFrame(step);
+            }
+            
+            // Reset animation to play again
+            function resetAnimation() {
+                // Clear all timeouts
+                timeoutIds.forEach(id => clearTimeout(id));
+                timeoutIds = [];
+                
+                // Reset all states
+                amineCharacter.classList.remove('walking', 'paused', 'jumping', 'happy-meeting');
+                douaeCharacter.classList.remove('walking', 'paused', 'jumping', 'happy-meeting');
+                
+                // Hide all gifts and reactions
+                const allGiftsAndReactions = charactersContainer.querySelectorAll('.gift, .reaction');
+                allGiftsAndReactions.forEach(element => {
+                    element.classList.remove('visible', 'floating');
+                    element.classList.add('hidden');
+                });
+                
+                // Remove any heart trails
+                const heartTrails = document.querySelectorAll('.heart-trail');
+                heartTrails.forEach(heart => heart.remove());
+                
+                // Reset animation flag and start again
+                animationStarted = false;
+                startCharacterAnimation();
+            }
+            
+            // Restart animation when clicking anywhere
+            document.body.addEventListener('click', function() {
+                resetAnimation();
+            });
+        });
             
             // Create stars
             const starsContainer = document.getElementById("stars");
@@ -641,24 +1017,23 @@
             }
             
             // Lyrics data updated with Arabic lyrics from SRT
-            // Lyrics data updated with Arabic lyrics from SRT
-const lyricsData = [
-    { time: 0.0, text: "يا دعاء" },
-    { time: 10.84, text: "يا دعاء يا دعاء خليتي قلبي معاك" },
-    { time: 23.0, text: "لا تخافي ما ننساك ما كاين حتى شي واحدة في قلبي معاك" },
-    { time: 34.959, text: "يا دعاء يا دعاء بنت الناس عقلي طاح قلبي طار" },
-    { time: 48.46, text: "ما عندي فين نرتاح نتي عندي أحلى صباح كل ما نشوفك" },
-    { time: 57.0, text: "تزيد الأفراح وكل ما نشوفك تزيد الأفراح يا دعاء يا دعاء" },
-    { time: 76.349, text: "زينك زين ما عندو حدود شفتك غير قلبي تايدوب" },
-    { time: 94.549, text: "كل نهار نتمنى نشوفك وحدك نتي سبابي نتوب يا دعاء يا دعاء" },
-    { time: 109.809, text: "واعدك غير نكون معاك حبي ليك غادي نوريك مهما صرى" },
-    { time: 122.469, text: "ما نخليك نتي الزين اللي خلاني نبغيك يا ملاك نور حياتي في قربك كل" },
-    { time: 135.829, text: "نجاتي ما نقدر نعيش بلا بيك نتي سبب كل سعادتي كل" },
-    { time: 148.569, text: "سعادتي يا دعاء يا دعاء عيونك بحر الأسرار ضحكتك" },
-    { time: 164.469, text: "تنور نهار كل شي فيك يسحرني وانتي عندي أجمل الأقدار" },
-    { time: 173.649, text: "قلبك طيب شبعان حنان حبك لي أغلى الأمان عاهدتك نبقى" },
-    { time: 188.749, text: "وفي حبك سكن في الوجدان يا دعاء يا دعاء" }
-];
+            const lyricsData = [
+                { time: 0.0, text: "يا دعاء" },
+                { time: 10.84, text: "يا دعاء يا دعاء خليتي قلبي معاك" },
+                { time: 23.0, text: "لا تخافي ما ننساك ما كاين حتى شي واحدة في قلبي معاك" },
+                { time: 34.959, text: "يا دعاء يا دعاء بنت الناس عقلي طاح قلبي طار" },
+                { time: 48.46, text: "ما عندي فين نرتاح نتي عندي أحلى صباح كل ما نشوفك" },
+                { time: 57.0, text: "تزيد الأفراح وكل ما نشوفك تزيد الأفراح يا دعاء يا دعاء" },
+                { time: 76.349, text: "زينك زين ما عندو حدود شفتك غير قلبي تايدوب" },
+                { time: 94.549, text: "كل نهار نتمنى نشوفك وحدك نتي سبابي نتوب يا دعاء يا دعاء" },
+                { time: 109.809, text: "واعدك غير نكون معاك حبي ليك غادي نوريك مهما صرى" },
+                { time: 122.469, text: "ما نخليك نتي الزين اللي خلاني نبغيك يا ملاك نور حياتي في قربك كل" },
+                { time: 135.829, text: "نجاتي ما نقدر نعيش بلا بيك نتي سبب كل سعادتي كل" },
+                { time: 148.569, text: "سعادتي يا دعاء يا دعاء عيونك بحر الأسرار ضحكتك" },
+                { time: 164.469, text: "تنور نهار كل شي فيك يسحرني وانتي عندي أجمل الأقدار" },
+                { time: 173.649, text: "قلبك طيب شبعان حنان حبك لي أغلى الأمان عاهدتك نبقى" },
+                { time: 188.749, text: "وفي حبك سكن في الوجدان يا دعاء يا دعاء" }
+            ];
             // Get DOM elements for lyrics
             const lyricsContainer = document.getElementById('lyricsContainer');
             const lyricsWrapper = document.getElementById('lyricsWrapper');
@@ -681,6 +1056,149 @@ const lyricsData = [
                     setTimeout(() => {
                         lyricsContainer.style.display = 'none';
                     }, 300);
+                    lyricsToggle.textContent = '🎵 Show Lyrics';
+                }
+            });
+            
+            // Current lyric element
+            const currentLyricElement = document.getElementById('currentLyric');
+            
+            // Track current active line to avoid unnecessary DOM updates
+            let currentActiveIndex = -1;
+            
+            // Offset to make lyrics appear slightly earlier (in seconds)
+            const timeOffset = 0.15;
+            
+            // Update lyrics based on current time - optimized version for single line display with look-ahead
+            function updateLyrics() {
+                if (!backgroundMusic.paused) {
+                    const currentTime = backgroundMusic.currentTime;
+                    
+                    // Use the look-ahead system to find the correct lyric to display
+                    let activeIndex = findLyricWithLookahead(currentTime);
+                    
+                    // Only update DOM if the active line changed
+                    if (activeIndex !== currentActiveIndex) {
+                        if (activeIndex >= 0) {
+                            // Update the current lyric with animation
+                            currentLyricElement.style.animation = 'none';
+                            // Trigger reflow
+                            void currentLyricElement.offsetWidth;
+                            currentLyricElement.textContent = lyricsData[activeIndex].text;
+                            currentLyricElement.style.animation = 'fadeText 0.3s ease-out';
+                        }
+                        
+                        currentActiveIndex = activeIndex;
+                    }
+                }
+                
+                // Continue updating at 60fps
+                requestAnimationFrame(updateLyrics);
+            }
+            
+            // Improved lyric finding with look-ahead to reduce delay
+            function findLyricWithLookahead(currentTime) {
+                // Look-ahead time (seconds) - adjust this as needed
+                const lookAheadTime = 0.25;
+                
+                // Use adjusted time for finding lyrics
+                const adjustedTime = currentTime + lookAheadTime;
+                
+                // Find the lyrics index using adjusted time
+                let index = findActiveLyricIndex(adjustedTime);
+                
+                // If we're very close to the next lyric, show it slightly early
+                if (index !== -1 && index < lyricsData.length - 1) {
+                    const nextLyricTime = lyricsData[index + 1].time;
+                    const timeToNextLyric = nextLyricTime - currentTime;
+                    
+                    // If next lyric is coming within 0.2 seconds and current lyric has been shown for at least 0.5 seconds
+                    if (timeToNextLyric < 0.2 && currentTime - lyricsData[index].time > 0.5) {
+                        return index + 1;
+                    }
+                }
+                
+                return index;
+            }
+            
+            // Binary search to find the current lyric index - much faster than linear search
+            function findActiveLyricIndex(currentTime) {
+                let low = 0;
+                let high = lyricsData.length - 1;
+                
+                // Empty lyrics case
+                if (high < 0) return -1;
+                
+                // Before first lyric
+                if (currentTime < lyricsData[0].time) return -1;
+                
+                // After last lyric
+                if (currentTime >= lyricsData[high].time) return high;
+                
+                while (low <= high) {
+                    const mid = Math.floor((low + high) / 2);
+                    
+                    // Found the perfect match
+                    if (currentTime >= lyricsData[mid].time && 
+                        (mid === lyricsData.length - 1 || currentTime < lyricsData[mid + 1].time)) {
+                        return mid;
+                    }
+                    
+                    if (currentTime < lyricsData[mid].time) {
+                        high = mid - 1;
+                    } else {
+                        low = mid + 1;
+                    }
+                }
+                
+                return -1;
+            }
+            
+            // Smooth scrolling function
+            function smoothScrollTo(element, target, duration) {
+                const start = element.scrollTop;
+                const change = target - start;
+                const startTime = performance.now();
+                
+                function animateScroll(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    
+                    // Easing function for smoother scroll
+                    const easeProgress = progress < 0.5 ? 2 * progress * progress : -1 + (4 - 2 * progress) * progress;
+                    
+                    element.scrollTop = start + change * easeProgress;
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(animateScroll);
+                    }
+                }
+                
+                requestAnimationFrame(animateScroll);
+            }
+            
+            // Preload handling for smoother playback
+            let updateLyricsStarted = false;
+            let requestPreload = false;
+            
+            // Start tracking lyrics when music plays or when preloaded
+            backgroundMusic.addEventListener('play', function() {
+                if (!updateLyricsStarted) {
+                    updateLyrics();
+                    updateLyricsStarted = true;
+                }
+            });
+            
+            // Modify the music toggle to also handle lyrics visibility
+            musicToggle.addEventListener('click', function() {
+                const musicEnabled = this.textContent.includes('Music On');
+                if (musicEnabled && !lyricsShown) {
+                    lyricsShown = true;
+                    lyricsContainer.style.display = 'block';
+                    lyricsToggle.textContent = '🎵 Hide Lyrics';
+                } else if (!musicEnabled) {
+                    lyricsShown = false;
+                    lyricsContainer.style.display = 'none';
                     lyricsToggle.textContent = '🎵 Show Lyrics';
                 }
             });
