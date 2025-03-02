@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Make sure images have proper sizing
         if (amineImg && douaeImg) {
             const imageStyle = {
-                maxHeight: '180px',
+                maxHeight: '150px', // Reduced from 180px
                 width: 'auto',
                 display: 'block',
                 filter: 'drop-shadow(0 5px 10px rgba(0,0,0,0.3))',
