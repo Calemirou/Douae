@@ -1,7 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-// Set scale factors based on device
-const scaleFactor = isMobileDevice() ? 0.6 : 1;
-const positionOffset = isMobileDevice() ? 50 : 0;
     // DOM Elements
     const stars = document.getElementById('stars');
     const flowers = document.getElementById('flowers');
