@@ -1,12 +1,12 @@
 // enhanced-animations.js - More complex animations
 
 // Characters moving around each other in a circle
-function moveCharactersAround() {
+ffunction moveCharactersAround() {
     const amine = document.getElementById('amine');
     const douae = document.getElementById('douae');
     const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight - 150;
-    const radius = 150;
+    const centerY = window.innerHeight - 150 * scaleFactor; // Apply scale factor
+    const radius = 150 * scaleFactor; // Apply scale factor
     let angle = 0;
     let duration = 8; // seconds
     let frames = duration * 60; // 60fps
