@@ -18,7 +18,8 @@
     position: absolute;
     bottom: 5%;
     transform-origin: bottom center;
-    transition: all 0.5s ease;
+    transition: all 0.8s ease;
+    opacity: 1 !important; /* Ensure characters are always visible */
 }
 
 .character img {
@@ -26,17 +27,19 @@
     width: auto;
     filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
     transform-origin: bottom center;
-    transition: transform 0.5s ease;
+    transition: transform 0.8s ease;
 }
 
 .amine {
     left: 42%;
     z-index: 21;
+    transform: translateX(-60px); /* Position closer to center */
 }
 
 .douae {
     right: 42%;
     z-index: 20;
+    transform: translateX(60px); /* Position closer to center */
 }
 
 /* Dancing effect animations */
@@ -95,11 +98,35 @@
 }
 
 .amine:hover img {
-    transform: rotate(10deg) scale(1.05);
+    transform: rotate(10deg) scale(1.1);
 }
 
 .douae:hover img {
-    transform: rotate(-10deg) scale(1.05);
+    transform: rotate(-10deg) scale(1.1);
+}
+
+/* Romantic background effect */
+.romantic-background {
+    pointer-events: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, rgba(255,192,203,0.2) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 2s ease;
+    z-index: 5;
+}
+
+/* Character initial appearance */
+@keyframes character-appear {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.character {
+    animation: character-appear 1s ease-out forwards;
 }
 
 /* Heart trail effect */
