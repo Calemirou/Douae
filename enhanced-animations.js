@@ -14,6 +14,39 @@ document.addEventListener('DOMContentLoaded', function() {
     const WINDOW_WIDTH = window.innerWidth;
     const WINDOW_HEIGHT = window.innerHeight;
     
+    // Fix PNG alignment
+    function fixImageAlignment() {
+        if (amineImg && douaeImg) {
+            // Set consistent dimensions and alignment
+            const imageStyle = {
+                width: '100%',
+                height: 'auto',
+                objectFit: 'contain',
+                display: 'block',
+                margin: '0 auto'
+            };
+            
+            // Apply styles to both images
+            [amineImg, douaeImg].forEach(img => {
+                Object.assign(img.style, imageStyle);
+            });
+            
+            // Make sure parent elements have consistent positioning
+            if (amine && douae) {
+                const containerStyle = {
+                    position: 'relative',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100%'
+                };
+                
+                Object.assign(amine.style, containerStyle);
+                Object.assign(douae.style, containerStyle);
+            }
+        }
+    }
+    
     // Advanced particles system
     class ParticleSystem {
         constructor(options) {
@@ -279,18 +312,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize text scrambler for message element
     const messageScrambler = messageElem ? new TextScrambler(messageElem) : null;
     
-    // Collection of love messages to display
+    // Collection of custom love messages to display
     const loveMessages = [
-        "Every moment with you makes my heart flutter. You are the light in my life.",
-        "Your smile brightens my darkest days, my love.",
-        "I'm so thankful for every minute we spend together.",
-        "You're the melody in my heart and the sunshine in my life.",
-        "Forever isn't long enough to spend with you.",
-        "My heart beats only for you, now and always.",
-        "You are my today and all of my tomorrows.",
-        "In your eyes, I found my home.",
-        "Your love is the greatest gift I've ever received.",
-        "You're not just my love, you're my best friend."
+        "You are my everything, now and forever.",
+        "With you, every day feels like a beautiful dream.",
+        "Our love story is my favorite fairytale.",
+        "My heart belongs to you, only you.",
+        "You make the world more beautiful just by being in it.",
+        "I fall in love with you all over again each day.",
+        "My love for you grows stronger with each passing moment.",
+        "You are the missing piece that makes my life complete.",
+        "Every beat of my heart whispers your name.",
+        "Life with you is the greatest adventure."
     ];
     
     // Change love message periodically
@@ -298,6 +331,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!messageScrambler) return;
         
         let currentIndex = 0;
+        
+        // Initial message
+        messageScrambler.setText(loveMessages[0]);
         
         setInterval(() => {
             currentIndex = (currentIndex + 1) % loveMessages.length;
@@ -655,6 +691,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize all enhanced animations
     function init() {
+        // Fix image alignment first
+        fixImageAlignment();
+        
         // Start particle systems
         heartParticles.start();
         floralParticles.start();
