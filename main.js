@@ -21,6 +21,13 @@ document.addEventListener("DOMContentLoaded", function() {
         console.error("Music system not found! Make sure animations-music.js is loaded before main.js");
     }
     
+    // Initialize enhanced animations (more intimate interactions)
+    if (typeof initEnhancedAnimations === 'function') {
+        initEnhancedAnimations();
+    } else {
+        console.error("Enhanced animations not found! Make sure enhanced-animations.js is loaded before main.js");
+    }
+    
     console.log("Animation and music systems initialized successfully!");
 });
 
@@ -74,6 +81,13 @@ function restartAllAnimations() {
     if (backgroundMusic) {
         backgroundMusic.currentTime = 0;
         backgroundMusic.play().catch(e => console.log('Audio play failed:', e));
+    }
+    
+    // Restart enhanced animations if available
+    if (typeof enhanceCharacterAnimations === 'function') {
+        setTimeout(() => {
+            enhanceCharacterAnimations();
+        }, 2000);
     }
     
     console.log("All animations restarted!");
