@@ -7,7 +7,7 @@ function walkCharacter(character, direction, distance, duration) {
         
         const property = direction === 'left' ? 'right' : 'left';
         character.style.transition = `${property} ${duration}s ease-in-out`;
-        character.style[property] = `${distance}px`;
+        character.style[property] = `${distance * scaleFactor}px`; // Apply scale factor here
         
         setTimeout(() => {
             character.classList.remove('walking');
@@ -110,8 +110,10 @@ function meetCharacters(amine, douae, duration = 2) {
         amine.style.transition = 'left 1.5s ease-in-out';
         douae.style.transition = 'right 1.5s ease-in-out';
         
-        amine.style.left = 'calc(50% - 100px)';
-        douae.style.right = 'calc(50% - 100px)';
+        // Apply scale factors here
+        const centerOffset = 100 * scaleFactor;
+        amine.style.left = `calc(50% - ${centerOffset}px)`;
+        douae.style.right = `calc(50% - ${centerOffset}px)`;
         
         // Wait for them to reach center
         setTimeout(() => {
@@ -127,7 +129,6 @@ function meetCharacters(amine, douae, duration = 2) {
         }, 1500);
     });
 }
-
 function pauseCharacters(amine, douae, duration = 1) {
     return new Promise(resolve => {
         amine.classList.add('paused');
