@@ -1,0 +1,152 @@
+/* Enhanced animation styles to be added to your CSS */
+
+/* Character animations */
+.characters-container {
+    position: fixed;
+    bottom: 10%;
+    width: 100%;
+    height: 220px;
+    z-index: 20;
+    pointer-events: none;
+    overflow: visible;
+}
+
+.character {
+    position: absolute;
+    bottom: 0;
+    transform-origin: bottom center;
+    transition: all 0.5s ease;
+}
+
+.character img {
+    height: 180px;
+    width: auto;
+    filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
+    transform-origin: bottom center;
+    transition: transform 0.5s ease;
+}
+
+.amine {
+    left: 32%;
+    z-index: 21;
+}
+
+.douae {
+    right: 32%;
+    z-index: 20;
+}
+
+/* Dancing effect animations */
+@keyframes float {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0); }
+}
+
+/* Heart animation */
+.heart-float {
+    position: absolute;
+    font-size: 30px;
+    opacity: 0;
+    transform: translateY(0) scale(0);
+    animation: heart-appear 2s ease-in-out forwards;
+    pointer-events: none;
+    z-index: 100;
+}
+
+@keyframes heart-appear {
+    0% { opacity: 0; transform: translateY(0) scale(0); }
+    20% { opacity: 1; transform: translateY(-20px) scale(1.2); }
+    40% { opacity: 1; transform: translateY(-40px) scale(1); }
+    80% { opacity: 0.7; transform: translateY(-100px) scale(0.8); }
+    100% { opacity: 0; transform: translateY(-120px) scale(0.2); }
+}
+
+/* Character glow effect */
+.character-glow {
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    right: -20px;
+    bottom: -20px;
+    border-radius: 50%;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+    pointer-events: none;
+}
+
+/* Special dance animation */
+@keyframes special-dance {
+    0% { transform: scale(1); }
+    25% { transform: scale(1.1) rotate(5deg); }
+    50% { transform: scale(1) rotate(-3deg); }
+    75% { transform: scale(1.05) rotate(2deg); }
+    100% { transform: scale(1); }
+}
+
+/* Interactive hover effects */
+.character:hover img {
+    filter: drop-shadow(0 8px 15px rgba(0,0,0,0.4));
+    transition: all 0.3s ease;
+}
+
+.amine:hover img {
+    transform: rotate(10deg) scale(1.05);
+}
+
+.douae:hover img {
+    transform: rotate(-10deg) scale(1.05);
+}
+
+/* Heart trail effect */
+.heart-trail {
+    position: absolute;
+    font-size: 24px;
+    z-index: 19;
+    animation: trail-float 2s forwards;
+    opacity: 0.8;
+    pointer-events: none;
+}
+
+@keyframes trail-float {
+    0% { opacity: 0.8; transform: translateY(0) scale(0.8); }
+    100% { opacity: 0; transform: translateY(-50px) scale(0.3); }
+}
+
+/* Simplify the background */
+body {
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Adjust stars to be more subdued */
+.star {
+    opacity: 0.6;
+}
+
+/* Hide lyrics container */
+.lyrics-container {
+    display: none !important;
+}
+
+/* Music control button styling */
+.music-control {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(5px);
+    border-radius: 30px;
+    padding: 8px 15px;
+    transition: all 0.3s ease;
+}
+
+.music-control:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.05);
+}
