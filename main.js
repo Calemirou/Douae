@@ -1,146 +1,402 @@
+// main.js - Main animation controller for romantic webpage
+
 document.addEventListener('DOMContentLoaded', function() {
-    // DOM Elements
+    // Elements
     const stars = document.getElementById('stars');
     const flowers = document.getElementById('flowers');
     const heart = document.querySelector('.heart');
-    const charactersContainer = document.getElementById('charactersContainer');
-    const amine = document.getElementById('amine');
-    const douae = document.getElementById('douae');
-    const backgroundMusic = document.getElementById('backgroundMusic');
     const musicToggle = document.getElementById('musicToggle');
     const lyricsToggle = document.getElementById('lyricsToggle');
     const lyricsContainer = document.getElementById('lyricsContainer');
-    const lyricsWrapper = document.getElementById('lyricsWrapper');
-    const currentLyric = document.getElementById('currentLyric');
+    const backgroundMusic = document.getElementById('backgroundMusic');
+    const charactersContainer = document.getElementById('charactersContainer');
+    const amineChar = document.getElementById('amine');
+    const douaeChar = document.getElementById('douae');
     
-    // Global variables
-    let isPlaying = false;
-    let showLyrics = false;
-    let animationStarted = false;
-    let charactersMet = false;
-    let heartTrails = [];
+    // Character state tracking
+    let characterState = {
+        amine: {
+            position: -150,
+            isWalking: false,
+            direction: 1, // 1 for right, -1 for left
+            jumpPower: 0,
+            hasGift: false,
+            giftType: null
+        },
+        douae: {
+            position: window.innerWidth + 150,
+            isWalking: false,
+            direction: -1, // -1 for left, 1 for right
+            jumpPower: 0,
+            reaction: null
+        },
+        isMeeting: false,
+        meetingStage: 0,
+        hasInteracted: false
+    };
     
-    // Create starry background
-    createStars();
+    // Animation frames tracking
+    let animationFrames = {
+        amine: 0,
+        douae: 0,
+        heartTrail: []
+    };
     
-    // Create floating flowers
-    createFlowers();
-    
-    // Gradually show heart
-    setTimeout(function() {
-        document.querySelector('.heart').style.animation = 'pulse 2s infinite';
-    }, 1000);
-    
-    // Event listeners
-    musicToggle.addEventListener('click', toggleMusic);
-    lyricsToggle.addEventListener('click', toggleLyrics);
-    document.body.addEventListener('click', createHeartOnClick);
-    
-    // Start music and animation when heart is clicked
-    document.querySelector('.heart').addEventListener('click', function() {
-        if (!animationStarted) {
-            startMainAnimation();
-            animationStarted = true;
-        }
-    });
-    
-    // Functions
+    // Create stars
     function createStars() {
-        for (let i = 0; i < 100; i++) {
+        stars.innerHTML = '';
+        const starCount = Math.floor(window.innerWidth * window.innerHeight / 2000);
+        
+        for (let i = 0; i < starCount; i++) {
             const star = document.createElement('div');
-            star.classList.add('star');
-            star.style.width = Math.random() * 3 + 'px';
+            star.className = 'star';
+            star.style.width = Math.random() * 3 + 1 + 'px';
             star.style.height = star.style.width;
-            star.style.left = Math.random() * 100 + 'vw';
-            star.style.top = Math.random() * 100 + 'vh';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
             star.style.animationDelay = Math.random() * 3 + 's';
             stars.appendChild(star);
         }
     }
     
+    // Create rising flowers
     function createFlowers() {
-        for (let i = 0; i < 20; i++) {
-            const flower = document.createElement('div');
-            flower.classList.add('flower');
-            flower.style.left = Math.random() * 100 + 'vw';
-            flower.style.animationDelay = Math.random() * 10 + 's';
-            flowers.appendChild(flower);
-        }
+        setInterval(() => {
+            if (document.visibilityState === 'visible') {
+                const flower = document.createElement('div');
+                flower.className = 'flower';
+                flower.style.left = Math.random() * 100 + '%';
+                flower.style.backgroundColor = getRandomColor();
+                flower.style.animationDuration = (Math.random() * 5 + 8) + 's';
+                flowers.appendChild(flower);
+                
+                // Remove flower after animation completes
+                setTimeout(() => {
+                    if (flower && flower.parentNode) {
+                        flower.parentNode.removeChild(flower);
+                    }
+                }, 13000);
+            }
+        }, 800);
     }
     
-    function createHeartOnClick(e) {
-        if (e.target.classList.contains('heart') || 
-            e.target.classList.contains('music-control') || 
-            e.target.classList.contains('lyrics-toggle') ||
-            e.target.closest('.lyrics-container')) {
-            return;
-        }
-        
-        // Create heart trail
+    // Generate random pastel color
+    function getRandomColor() {
+        const hue = Math.floor(Math.random() * 360);
+        return `hsl(${hue}, 100%, 85%)`;
+    }
+    
+    // Create floating heart trail
+    function createHeartTrail(x, y) {
         const heart = document.createElement('div');
+        heart.className = 'heart-trail';
         heart.innerHTML = '❤️';
-        heart.classList.add('heart-trail');
-        heart.style.left = e.clientX + 'px';
-        heart.style.top = e.clientY + 'px';
+        heart.style.left = x + 'px';
+        heart.style.top = y + 'px';
+        
+        // Random size and rotation
+        const size = 0.5 + Math.random() * 0.5;
+        const rotation = (Math.random() - 0.5) * 40;
+        heart.style.transform = `scale(${size}) rotate(${rotation}deg)`;
+        
         document.body.appendChild(heart);
         
-        // Remove heart after animation
+        // Remove heart after animation completes
         setTimeout(() => {
-            heart.remove();
+            if (heart && heart.parentNode) {
+                heart.parentNode.removeChild(heart);
+            }
         }, 2000);
     }
     
-    function toggleMusic() {
-        if (isPlaying) {
-            backgroundMusic.pause();
-            musicToggle.textContent = '🎵 Music Off';
-            resetCharactersPosition();
-        } else {
-            backgroundMusic.play();
-            musicToggle.textContent = '🎵 Music On';
-            if (!animationStarted) {
-                startMainAnimation();
-                animationStarted = true;
+    // Super Mario style movement for characters
+    function updateCharacterPositions() {
+        // Update Amine's position
+        if (characterState.amine.isWalking) {
+            characterState.amine.position += 3 * characterState.amine.direction;
+            amineChar.style.left = characterState.amine.position + 'px';
+            
+            // Apply jumping if active
+            if (characterState.amine.jumpPower !== 0) {
+                // Super Mario arc jump physics
+                characterState.amine.jumpPower -= 0.5; // Gravity
+                let jumpHeight = Math.max(0, characterState.amine.jumpPower);
+                amineChar.style.bottom = jumpHeight + 'px';
+                
+                if (characterState.amine.jumpPower <= 0 && jumpHeight <= 0) {
+                    characterState.amine.jumpPower = 0;
+                    amineChar.style.bottom = '0px';
+                }
+            }
+            
+            // Create heart trail for Amine when walking toward Douae
+            if (characterState.amine.direction > 0 && Math.random() < 0.1) {
+                const rect = amineChar.getBoundingClientRect();
+                createHeartTrail(rect.left + rect.width / 2, rect.top + rect.height / 3);
             }
         }
-        isPlaying = !isPlaying;
+        
+        // Update Douae's position
+        if (characterState.douae.isWalking) {
+            characterState.douae.position += 3 * characterState.douae.direction;
+            douaeChar.style.right = window.innerWidth - characterState.douae.position + 'px';
+            
+            // Apply jumping if active
+            if (characterState.douae.jumpPower !== 0) {
+                characterState.douae.jumpPower -= 0.5; // Gravity
+                let jumpHeight = Math.max(0, characterState.douae.jumpPower);
+                douaeChar.style.bottom = jumpHeight + 'px';
+                
+                if (characterState.douae.jumpPower <= 0 && jumpHeight <= 0) {
+                    characterState.douae.jumpPower = 0;
+                    douaeChar.style.bottom = '0px';
+                }
+            }
+        }
+        
+        // Handle meeting
+        if (!characterState.isMeeting) {
+            const amineRect = amineChar.getBoundingClientRect();
+            const douaeRect = douaeChar.getBoundingClientRect();
+            
+            // Check if characters are close enough to meet
+            if (Math.abs(amineRect.right - douaeRect.left) < 50) {
+                characterState.isMeeting = true;
+                startMeetingSequence();
+            }
+        }
+        
+        requestAnimationFrame(updateCharacterPositions);
     }
     
-    function toggleLyrics() {
-        showLyrics = !showLyrics;
-        lyricsContainer.style.display = showLyrics ? 'block' : 'none';
-        lyricsToggle.textContent = showLyrics ? '🎵 Hide Lyrics' : '🎵 Show Lyrics';
+    // Start character movement scene
+    function startCharacterScene() {
+        // Position characters initially off-screen
+        amineChar.style.left = characterState.amine.position + 'px';
+        douaeChar.style.right = window.innerWidth - characterState.douae.position + 'px';
+        
+        // Make characters start walking
+        characterState.amine.isWalking = true;
+        characterState.douae.isWalking = true;
+        amineChar.classList.add('walking');
+        douaeChar.classList.add('walking');
+        
+        // Choose a random gift for Amine to bring
+        const gifts = ['flower', 'heart', 'gift-box'];
+        characterState.amine.giftType = gifts[Math.floor(Math.random() * gifts.length)];
+        characterState.amine.hasGift = true;
+        
+        // Start the position update loop
+        updateCharacterPositions();
     }
     
-    function startMainAnimation() {
-        // Start music
-        backgroundMusic.play();
-        isPlaying = true;
-        musicToggle.textContent = '🎵 Music On';
+    // Meeting sequence between characters
+    function startMeetingSequence() {
+        // Stop walking animations
+        characterState.amine.isWalking = false;
+        characterState.douae.isWalking = false;
+        amineChar.classList.remove('walking');
+        douaeChar.classList.remove('walking');
         
-        // Start animations based on the music timeline
-        initializeMusicSyncedAnimations();
+        // Begin the meeting sequence
+        meetingStage1();
     }
     
-    function resetCharactersPosition() {
-        // Reset character positions if animation is paused
-        amine.style.transition = 'left 0.5s ease-in-out';
-        douae.style.transition = 'right 0.5s ease-in-out';
-        amine.style.left = '-150px';
-        douae.style.right = '-150px';
+    // First stage of meeting - Amine jumps with excitement
+    function meetingStage1() {
+        // Amine jumps with excitement
+        characterState.amine.jumpPower = 30;
+        amineChar.classList.add('jumping');
         
-        // Remove any animations
-        amine.classList.remove('walking', 'jumping', 'dancing', 'spinning', 'happy-meeting', 'paused');
-        douae.classList.remove('walking', 'jumping', 'dancing', 'spinning', 'happy-meeting', 'paused');
+        setTimeout(() => {
+            amineChar.classList.remove('jumping');
+            
+            // Show gift from Amine
+            if (characterState.amine.hasGift) {
+                const giftElement = amineChar.querySelector(`.gift.${characterState.amine.giftType}`);
+                giftElement.classList.remove('hidden');
+                giftElement.classList.add('visible', 'floating');
+                
+                // Douae reacts with surprise
+                setTimeout(() => {
+                    const surpriseReaction = douaeChar.querySelector('.reaction.surprise');
+                    surpriseReaction.classList.remove('hidden');
+                    surpriseReaction.classList.add('visible');
+                    
+                    // Douae jumps with happiness
+                    setTimeout(() => {
+                        characterState.douae.jumpPower = 30;
+                        douaeChar.classList.add('jumping');
+                        
+                        // Hide surprise, show happiness
+                        setTimeout(() => {
+                            surpriseReaction.classList.remove('visible');
+                            surpriseReaction.classList.add('hidden');
+                            
+                            const happyReaction = douaeChar.querySelector('.reaction.love');
+                            happyReaction.classList.remove('hidden');
+                            happyReaction.classList.add('visible', 'floating');
+                            
+                            // Both characters happy bounce
+                            setTimeout(() => {
+                                amineChar.classList.add('happy-meeting');
+                                douaeChar.classList.add('happy-meeting');
+                                
+                                // Trigger heart effects
+                                triggerHeartExplosion();
+                                
+                                // Reset for next interaction
+                                setTimeout(resetCharacters, 5000);
+                            }, 1000);
+                        }, 600);
+                    }, 500);
+                }, 500);
+            }
+        }, 600);
+    }
+    
+    // Trigger heart explosion effect
+    function triggerHeartExplosion() {
+        // Create heart explosion at the center point between characters
+        const amineRect = amineChar.getBoundingClientRect();
+        const douaeRect = douaeChar.getBoundingClientRect();
         
-        // Hide gifts and reactions
-        document.querySelectorAll('.gift, .reaction').forEach(element => {
-            element.classList.remove('visible', 'floating');
-            element.classList.add('hidden');
+        const centerX = (amineRect.right + douaeRect.left) / 2;
+        const centerY = (amineRect.top + douaeRect.top) / 2;
+        
+        // Create multiple hearts in an explosion pattern
+        for (let i = 0; i < 15; i++) {
+            setTimeout(() => {
+                const offsetX = (Math.random() - 0.5) * 100;
+                const offsetY = (Math.random() - 0.5) * 100;
+                createHeartTrail(centerX + offsetX, centerY + offsetY);
+            }, i * 100);
+        }
+    }
+    
+    // Reset characters to start positions
+    function resetCharacters() {
+        // Hide all gifts and reactions
+        const gifts = amineChar.querySelectorAll('.gift');
+        const reactions = douaeChar.querySelectorAll('.reaction');
+        
+        gifts.forEach(gift => {
+            gift.classList.remove('visible', 'floating');
+            gift.classList.add('hidden');
         });
         
-        // Reset flags
-        charactersMet = false;
-        animationStarted = false;
+        reactions.forEach(reaction => {
+            reaction.classList.remove('visible', 'floating');
+            reaction.classList.add('hidden');
+        });
+        
+        // Remove special class states
+        amineChar.classList.remove('happy-meeting', 'jumping');
+        douaeChar.classList.remove('happy-meeting', 'jumping');
+        
+        // Reset positions
+        characterState.amine.position = -150;
+        characterState.douae.position = window.innerWidth + 150;
+        amineChar.style.left = characterState.amine.position + 'px';
+        douaeChar.style.right = window.innerWidth - characterState.douae.position + 'px';
+        
+        // Reset states
+        characterState.isMeeting = false;
+        characterState.meetingStage = 0;
+        
+        // Choose new gift
+        const gifts_array = ['flower', 'heart', 'gift-box'];
+        characterState.amine.giftType = gifts_array[Math.floor(Math.random() * gifts_array.length)];
+        
+        // Start walking again after a delay
+        setTimeout(() => {
+            characterState.amine.isWalking = true;
+            characterState.douae.isWalking = true;
+            amineChar.classList.add('walking');
+            douaeChar.classList.add('walking');
+        }, 1000);
     }
+    
+    // Music and lyrics handling
+    function setupMusic() {
+        // Toggle music
+        musicToggle.addEventListener('click', function() {
+            if (backgroundMusic.paused) {
+                backgroundMusic.play();
+                musicToggle.textContent = '🎵 Music Off';
+            } else {
+                backgroundMusic.pause();
+                musicToggle.textContent = '🎵 Music On';
+            }
+        });
+        
+        // Toggle lyrics
+        lyricsToggle.addEventListener('click', function() {
+            if (lyricsContainer.style.display === 'block') {
+                lyricsContainer.style.display = 'none';
+                lyricsToggle.textContent = '🎵 Show Lyrics';
+            } else {
+                lyricsContainer.style.display = 'block';
+                lyricsToggle.textContent = '🎵 Hide Lyrics';
+            }
+        });
+    }
+    
+    // Create clickable heart effects
+    function setupClickEffects() {
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('music-control') || 
+                e.target.classList.contains('lyrics-toggle')) {
+                return; // Don't create hearts when clicking controls
+            }
+            
+            // Create hearts on click
+            for (let i = 0; i < 3; i++) {
+                const offsetX = (Math.random() - 0.5) * 40;
+                const offsetY = (Math.random() - 0.5) * 40;
+                setTimeout(() => {
+                    createHeartTrail(e.clientX + offsetX, e.clientY + offsetY);
+                }, i * 100);
+            }
+            
+            // Trigger jump for characters if they're on screen
+            if (characterState.amine.position > -100 && 
+                characterState.amine.position < window.innerWidth + 100 &&
+                !characterState.isMeeting && 
+                characterState.amine.jumpPower === 0) {
+                characterState.amine.jumpPower = 20;
+            }
+            
+            if (characterState.douae.position > -100 && 
+                characterState.douae.position < window.innerWidth + 100 &&
+                !characterState.isMeeting &&
+                characterState.douae.jumpPower === 0) {
+                characterState.douae.jumpPower = 20;
+            }
+        });
+    }
+    
+    // Initialize everything
+    function init() {
+        createStars();
+        createFlowers();
+        setupMusic();
+        setupClickEffects();
+        
+        // Start character animation after a delay
+        setTimeout(startCharacterScene, 2000);
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            createStars();
+            
+            // Adjust character positions if needed
+            if (characterState.douae.position > window.innerWidth + 150) {
+                characterState.douae.position = window.innerWidth + 150;
+            }
+        });
+    }
+    
+    // Start everything
+    init();
 });
