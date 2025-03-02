@@ -24,7 +24,7 @@
             left: 50%;
             transform: translateX(-50%);
             width: 90%;
-            max-width: 600px;
+            max-width: 700px;
             background: rgba(0, 0, 0, 0.8);
             border-radius: 15px;
             padding: 20px;
@@ -75,28 +75,38 @@
         }
 
         .current-lyric {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: bold;
-            margin: 10px 0;
+            margin: 15px 0;
             color: white;
             text-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
             line-height: 1.5;
-            min-height: 3rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 5px 10px;
-            background: rgba(0, 0, 0, 0.4);
+            min-height: 4rem;
+            display: block;
+            text-align: center;
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.5);
             border-radius: 10px;
             transition: all 0.3s ease;
+            word-spacing: 0.3em;
+            letter-spacing: 0.05em;
+        }
+        
+        /* Word styling */
+        .word {
+            display: inline-block;
+            padding: 0 3px;
+            transition: all 0.2s ease-in-out;
+            border-radius: 5px;
         }
         
         /* Highlight word animation */
         .highlight {
             color: #FFFF00;
-            text-shadow: 0 0 10px rgba(255, 255, 0, 0.7);
+            text-shadow: 0 0 10px rgba(255, 255, 0, 0.8);
             font-weight: bold;
-            transition: color 0.2s ease;
+            transform: scale(1.05);
+            transition: all 0.2s ease;
         }
         
         @keyframes fadeText {
@@ -174,7 +184,7 @@
     
     <!-- Enhanced Lyrics Container -->
     <div class="lyrics-container" id="lyricsContainer">
-        <div class="lyrics-title">Tick tock</div>
+        <div class="lyrics-title">Tik tok</div>
         <div class="current-lyric" id="currentLyric">...waiting for lyrics...</div>
     </div>
     
@@ -294,11 +304,19 @@
                     clearInterval(progressiveHighlightInterval);
                 }
                 
-                // Split the text into words and create spans
+                // Split the text into words and create spans with proper spacing
                 const words = text.split(' ');
-                currentLyricElement.innerHTML = words.map(word => 
-                    `<span class="word">${word}</span>`
-                ).join(' ');
+                const wordSpans = words.map(word => `<span class="word">${word}</span>`);
+                
+                // Join with proper spacing
+                currentLyricElement.innerHTML = '';
+                wordSpans.forEach((span, index) => {
+                    currentLyricElement.innerHTML += span;
+                    // Add space after each word except the last one
+                    if (index < wordSpans.length - 1) {
+                        currentLyricElement.innerHTML += ' ';
+                    }
+                });
                 
                 // Get all word spans
                 const wordElements = currentLyricElement.querySelectorAll('.word');
@@ -309,6 +327,9 @@
                     word.classList.remove('highlight');
                 });
                 
+                // Calculate highlight interval based on lyric length
+                const highlightInterval = Math.min(Math.max(150, 800 / words.length), 350);
+                
                 // Set up interval to highlight words progressively
                 progressiveHighlightInterval = setInterval(() => {
                     if (currentWordIndex < wordElements.length) {
@@ -317,7 +338,7 @@
                     } else {
                         clearInterval(progressiveHighlightInterval);
                     }
-                }, 300); // Adjust timing based on song tempo
+                }, highlightInterval);
             }
             
             // Update lyrics based on current time
