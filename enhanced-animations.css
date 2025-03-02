@@ -23,11 +23,12 @@
 }
 
 .character img {
-    height: 180px;
+    height: 150px; /* Reduced from 180px */
     width: auto;
     filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
     transform-origin: bottom center;
     transition: transform 0.8s ease;
+    object-fit: contain; /* Ensure image isn't cropped */
 }
 
 .amine {
